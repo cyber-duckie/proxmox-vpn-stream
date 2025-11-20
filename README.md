@@ -16,26 +16,28 @@ The goal of the project was to build a privacy-focused streaming and automation 
 2. Architecture Diagram (ASCII)
 ```
                 ┌─────────────────────────┐
-                │     Proxmox Host        │   <--- VPN Connection via Tailscale for remote management / access --->
-                │  (Bridged Network, LXC  │                      │
+                │     Proxmox Host        │   <--- VPN Connection via Tailscale
+                │  (Bridged Network, LXC  │        for remote management/ access
                 │    management)          │                      │
                 └───────▲───────────▲─────┘                      └────► My remote Network
                         │           │
                         │           │
-           ┌────────────┘           └────────────┐
-           │                                     │
-   ┌───────┴─────────┐                    ┌───────┴─────────┐
-   │    VPN LXC      │   Bridged Network  │    Stremio LXC  │
-   │ wg0: 10.2.0.2   │ <────────────────> │ No direct WAN   │
-   │ DNS: 10.2.0.1   │                    │ Uses VPN LXC    │
-   │ Torbox / AI     │                    │ AIostreams Addon│
-   └───────▲─────────┘                    └─────────────────┘
-           │                                     
-           │                                     
-           │ 
-    ┌────────────┐
-    │  Internet  │
-    └────────────┘
+           ┌────────────┘           └───────────────┐
+           │                                        │
+   ┌───────┴───────────┐                    ┌───────┴─────────┐
+   │    VPN LXC        │   Bridged Network  │    Stremio LXC  │
+   │ wg0: 192.168.0.28 │ <────────────────> │ No direct WAN   │
+   │ DNS: X.X.X.X      │                    │ Uses VPN LXC    │
+   │ Torbox / AI       │                    │ AIostreams Addon│
+   └───────▲───────────┘                    └─────────────────┘
+           │                                       │
+           │                                       │
+           │                                       │
+    ┌────────────┐                 ┌────────────────────────────────┐ 
+    │  Internet  │                 │          192.168.0.X           │
+    └────────────┘                 │ Internal Network for Streaming │
+                                   │    on Smart TV/ IPad / etc     │
+                                   └────────────────────────────────┘
 ```
 
 3. How It Works
@@ -88,7 +90,7 @@ Streaming addon geolocation freedom
 
 - Harden the system with firewall rules and access control + configure NAT and disable IPv6
 
-  
+
 5. Future Expansion
 
 The architecture supports adding more containers, such as:
