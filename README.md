@@ -112,6 +112,17 @@ This guarantees that the script always boots with the container, applies the tem
 
 --> The script is located at VPN-LXC/initial-vpn-connection-script for reference!
 
+6. Final test for any DNS / IP Leaks from both containers:
+
+![Testing VPN](images/vpn-lxc-test.png)
+
+Then a quick check using an online IP lookup tool:
+
+![IP location](images/vpn-location.png)
+
+
+It works! All routing goes through my VPN including any DNS queries!
+
 6. Future Expansion
 
 The architecture supports adding more containers, such as:
