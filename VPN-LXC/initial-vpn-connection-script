@@ -1,0 +1,65 @@
+# WG Routing Script
+## How it works:
+
+This script ensures that the VPN LXC first has normal Internet connectivity via `1.1.1.1` after boot, which is essential to establish the initial Wireguard VPN connection, after which following configurations are made:
+
+1. Temporary DNS bootstrap:
+
+Sets /etc/resolv.conf to 1.1.1.1 so the container can reach the internet before the VPN is up.
+
+2. WireGuard interface check and activation:
+
+Checks if wg0 is active; if not, brings it up using wg-quick up wg0.
+
+3. Wait for VPN DNS availability:
+
+Loops for up to 15 seconds, testing if the VPN DNS (10.2.0.1) responds to a DNS query.
+
+4. Switch to VPN DNS:
+
+Once reachable, overwrites /etc/resolv.conf to point to 10.2.0.1 (My VPN’s DNS).
+
+5. Apply DNS leak protection:
+
+Uses iptables to block all DNS traffic (UDP/TCP port 53) that is not going to the VPN DNS, preventing leaks outside the VPN.
+
+## Usage
+
+#!/bin/bash
+# vpn-dns-lock.sh
+
+WG_IF="wg0"
+VPN_DNS="10.2.0.1"
+TEMP_DNS="1.1.1.1"
+WAIT_TIMEOUT=15
+
+# 1. Set temporary DNS to bootstrap VPN
+echo "nameserver $TEMP_DNS" > /etc/resolv.conf
+echo "[INFO] Temporary DNS $TEMP_DNS set."
+
+# 2. Bring up WireGuard if not already up
+if ! wg show $WG_IF &>/dev/null; then
+    echo "[INFO] Bringing up WireGuard interface $WG_IF..."
+    wg-quick up $WG_IF
+fi
+
+# 3. Wait until VPN DNS responds
+echo "[INFO] Waiting for VPN DNS $VPN_DNS..."
+for i in $(seq 1 $WAIT_TIMEOUT); do
+    if dig @"$VPN_DNS" google.com +short &>/dev/null; then
+        echo "[INFO] VPN DNS reachable!"
+        break
+    fi
+    sleep 1
+done
+
+# 4. Switch resolv.conf to VPN DNS
+echo "nameserver $VPN_DNS" > /etc/resolv.conf
+echo "[INFO] Switched to VPN DNS $VPN_DNS."
+
+# 5. Apply DNS leak protection
+iptables -C OUTPUT ! -d $VPN_DNS -p udp --dport 53 -j REJECT 2>/dev/null || \
+iptables -I OUTPUT ! -d $VPN_DNS -p udp --dport 53 -j REJECT
+iptables -C OUTPUT ! -d $VPN_DNS -p tcp --dport 53 -j REJECT 2>/dev/null || \
+iptables -I OUTPUT ! -d $VPN_DNS -p tcp --dport 53 -j REJECT
+echo "[INFO] DNS leak protection applied."
