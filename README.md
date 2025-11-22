@@ -95,10 +95,24 @@ Streaming addon geolocation freedom
 
 - Harden the system with firewall rules and access control + configure NAT and disable IPv6
 
-- Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (more on this later).
+- Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)
 
 
-5. Future Expansion
+5. Systemd Auto-Start Integration
+
+To ensure the DNS-lock script runs automatically on every boot, I created a custom systemd service that executes /usr/local/bin/vpn-dns-lock.sh during startup. The service is placed in /etc/systemd/system/vpn-dns-lock.service and is configured to run after the network comes online.
+
+After creating the service, I enabled it with:
+
+''
+systemctl enable vpn-dns-lock.service
+systemctl start vpn-dns-lock.service
+''
+This guarantees that the script always boots with the container, applies the temporary DNS, brings up the VPN, switches to Proton’s DNS, and enforces DNS leak protection without manual intervention.
+
+--> The script is located at /VPN/XXXXX for reference!
+
+6. Future Expansion
 
 The architecture supports adding more containers, such as:
 
