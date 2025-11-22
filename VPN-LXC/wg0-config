@@ -1,0 +1,18 @@
+[Interface]
+# Example Wireguard config file for my VPN LXC with redacted info
+# Bouncing = 17
+# NetShield = 2
+# Moderate NAT = off
+# NAT-PMP (Port Forwarding) = off
+# VPN Accelerator = on
+PrivateKey = XXXXXXXXXXX
+Address = 10.XX.XX/XX
+DNS = 10.XX.XX.XX
+PostUp = sysctl -w net.ipv6.conf.all.disable_ipv6=1
+PostDown = sysctl -w net.ipv6.conf.all.disable_ipv6=1
+
+[Peer]
+# COUNTRY#NUMBER
+PublicKey = XXXXXXXXXXX
+AllowedIPs = 0.0.0.0/0
+Endpoint = XX.XX.XX.XX:XXXXX
