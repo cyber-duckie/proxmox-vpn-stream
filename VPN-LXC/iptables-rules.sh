@@ -16,5 +16,5 @@ Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
 
 Chain OUTPUT (policy ACCEPT 102K packets, 16M bytes)
  pkts bytes target     prot opt in     out     source               destination         
-    0     0 REJECT     6    --  *      *       0.0.0.0/0           !XX.X.X.X             tcp dpt:53 reject-with icmp-port-unreachable
-   XX   XXX REJECT     17   --  *      *       0.0.0.0/0           !XX.X.X.X             udp dpt:53 reject-with icmp-port-unreachable
+    0     0 REJECT     6    --  *      *       0.0.0.0/0           !10.X.X.X             tcp dpt:53 reject-with icmp-port-unreachable
+   XX   XXX REJECT     17   --  *      *       0.0.0.0/0           !10.X.X.X             udp dpt:53 reject-with icmp-port-unreachable
