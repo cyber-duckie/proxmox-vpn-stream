@@ -104,13 +104,13 @@ To ensure the DNS-lock script runs automatically on every boot, I created a cust
 
 After creating the service, I enabled it with:
 
-''
+```
 systemctl enable vpn-dns-lock.service
 systemctl start vpn-dns-lock.service
-''
+```
 This guarantees that the script always boots with the container, applies the temporary DNS, brings up the VPN, switches to Proton’s DNS, and enforces DNS leak protection without manual intervention.
 
---> The script is located at /VPN/XXXXX for reference!
+--> The script is located at VPN-LXC/initial-vpn-connection-script for reference!
 
 6. Future Expansion
 
