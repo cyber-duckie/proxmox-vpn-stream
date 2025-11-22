@@ -1,17 +1,22 @@
 # Hardened Home Server Setup (Proxmox + VPN Streaming + Modular LXC Stack)
-1. Overview
+1. 📦 Overview
 
-This project documents a hardened, all-round home server I built as a gift.
+This project documents a hardened, media streaming server that uses Stremio which I built as a gift.
 The system is designed for security, modularity, and expandability, using Proxmox VE as the hypervisor.
-It includes:
 
-A dedicated VPN LXC that acts as a secure, routed gateway
+In it's current configuration, it runs:
 
-A Stremio Server LXC, running Stremio via Docker and routing all outbound traffic through the VPN
+--> 📡 VPN LXC – Runs ProtonVPN-CLI / WireGuard and acts as a gateway.
+
+--> 📺 Stremio LXC – Runs the Stremio server, sending all outbound traffic through the VPN container.
+
+Network routing is handled using policy-based routing, iptables, and Proxmox container configuration.
 
 A future-proof architecture that allows adding LXC containers for Home Assistant, Frigate, and other home-automation services
 
 The goal of the project was to build a privacy-focused streaming and automation environment that can grow over time without compromising security.
+
+This Github Project aims to give others a guide on how to setup such a streaming server and for myself as a repository to copy the code if i want to replicate this server for other relatives with ease without having to rebuild and reconfigure everything from scratch.
 
 2. Architecture Diagram (ASCII)
 ```
@@ -45,23 +50,23 @@ The goal of the project was to build a privacy-focused streaming and automation 
 
 The Proxmox host manages all LXCs and provides hardware virtualization, backups, and isolation features.
 
--  VPN LXC (Gateway Container)
+-  📡 VPN LXC (Gateway Container)
 
-This LXC contains the VPN client (e.g., ProtonVPN, WireGuard).
-It exposes a private internal interface to the Stremio LXC via a separate bridge.
+This LXC contains the VPN client (e.g., ProtonVPN running on wireguard WireGuard).
+It exposes a private internal interface to the Stremio LXC via a separate bridge (vmbr99) in my case but this is up to you.
 
 Responsibilities:
 
-Handles all outbound internet traffic
+Handles all outbound internet traffic for the Stremio LXC
 
 Provides region-unlocked streaming access
 
 Acts as the secure gateway for dependent containers
 
--  Stremio LXC
+-  📺 Stremio LXC
 
 This container runs Docker with a Stremio Server instance.
-It has no direct internet route — its only network path goes through the VPN LXC.
+It has no direct internet route — its only network path goes through the VPN LXC (vmbr99).
 
 Benefits:
 
@@ -78,9 +83,9 @@ Streaming addon geolocation freedom
 
 - Install and configure the VPN client (Wireguard using a ProtonVPN subscription)
 
-- Create internal bridge (vmbr99) for isolated routing between both LXC
+- Create internal bridge (vmbr99) for isolated routing between both LXCs
 
-- Create Stremio LXC attached to the private VPN bridge, disable outbound internet connectivity
+- Create a Stremio LXC attached to the private VPN bridge, disable outbound internet connectivity
 
 - Run Stremio Docker container
 
@@ -89,6 +94,8 @@ Streaming addon geolocation freedom
 - Test: verify Stremio has only VPN-based internet access
 
 - Harden the system with firewall rules and access control + configure NAT and disable IPv6
+
+- Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (more on this later).
 
 
 5. Future Expansion
