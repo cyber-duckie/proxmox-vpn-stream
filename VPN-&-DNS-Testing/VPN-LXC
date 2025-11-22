@@ -1,0 +1,12 @@
+# Test Public IP from inside the VPN LXC:
+
+curl icanhazip.com
+# Should show your VPN IP here
+
+# Test DNS resolution:
+cat /etc/resolv.conf
+# It should show you your VPN's DNS server (in my case: 10.2.0.1)
+
+# Verify traffic is routed though the VPN
+traceroute 8.8.8.8
+# The first hop should be the VPN, not your host’s default gateway.
