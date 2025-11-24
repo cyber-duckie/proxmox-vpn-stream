@@ -22,21 +22,24 @@ This Github Project aims to give others a guide on how to setup such a streaming
 ```
                 ┌─────────────────────────┐
                 │     Proxmox Host        │   <--- VPN Connection via Tailscale
-                │  (Bridged Network, LXC  │        for remote management/ access
-                │    management)          │                      │
-                └───────▲───────────▲─────┘                      └────► My remote Network
-                        │           │
-                        │           │
-           ┌────────────┘           └───────────────┐
-           │                                        │
-   ┌───────┴───────────┐                    ┌───────┴─────────┐
-   │    VPN LXC        │   Bridged Network  │    Stremio LXC  │
-   │ wg0: 192.168.0.28 │ <────────────────> │ No direct WAN   │
-   │ DNS: X.X.X.X      │                    │ Uses VPN LXC    │
-   │ Torbox / AI       │                    │ AIostreams Addon│
-   └───────▲───────────┘                    └─────────────────┘
-           │                                       │
-           │                                       │
+                │  (Bridged Network, LXC  │        for remote Management/ Access
+                │    management)          │                     │
+                │  - Fail2Ban             │                     │
+                │  - Tailscale VPN        │                     │
+                │  - Netdata              │                     │    ┌───────────────────┐
+                └─────▲─────▲─────▲───────┘                     └────► My remote Network │
+                        │   │     │                                  └───────────────────┘
+                        │   │     └────────────────────────────────────────────┐
+           ┌────────────┘   └───────────────────────┐                          │
+           │                                        │                          │
+   ┌───────┴───────────┐                    ┌───────┴───────┐     ┌────────────┴────────────┐
+   │    VPN LXC        │   Bridged Network  │   Stremio LXC │     │  Lightweight ARCH Linux │
+   │ wg0: 192.168.0.28 │ <────────────────> │ No direct WAN │     │  for remote access      │
+   │ VPN DNS           │                    │ Uses VPN LXC  │     │  of network devices     │
+   │                   │                    │               │     │  e.g. router interface  │
+   └───────▲───────────┘                    └───────────────┘     │  to add IP reservations │
+           │                                       │              │  for future LXCs        │
+           │                                       │              └─────────────────────────┘ 
            │                                       │
     ┌────────────┐                 ┌────────────────────────────────┐ 
     │  Internet  │                 │          192.168.0.X           │
