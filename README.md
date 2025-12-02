@@ -103,17 +103,123 @@ Streaming addon geolocation freedom
 
 5. Systemd Auto-Start Integration
 
-To ensure the DNS-lock script runs automatically on every boot, I created a custom systemd service that executes /usr/local/bin/vpn-dns-lock.sh during startup. The service is placed in /etc/systemd/system/vpn-dns-lock.service and is configured to run after the network comes online.
+The following will show the steps I took to make a custom script that automatically runs on every boot. It ensures:
 
-After creating the service, I enabled it with:
+- No DNS leaks
+
+- The VPN DNS is only used after the VPN tunnel is up
+
+- All DNS traffic is blocked unless it goes to the VPN DNS
+
+- The system temporarily uses a public DNS to bring up the VPN interface
+
+- Fully automatic on boot via systemd
+
+This tutorial assumes:
+
+- Your ProtonVPN LXC runs WireGuard (wg0)
+
+- VPN DNS is: 10.2.0.1
+
+- Temporary DNS for bootstrapping: 1.1.1.1 (cloudflare)
+
+(1). Create the VPN bootstrap script
+Inside the VPN LXC, create:
 
 ```
-systemctl enable vpn-dns-lock.service
-systemctl start vpn-dns-lock.service
+sudo nano /usr/local/bin/vpn-dns-lock.sh
 ```
-This guarantees that the script always boots with the container, applies the temporary DNS, brings up the VPN, switches to Proton’s DNS, and enforces DNS leak protection without manual intervention.
 
---> The script is located at VPN-LXC/initial-vpn-connection-script for reference!
+(2). Enter the following script:
+```
+#!/bin/bash
+# vpn-dns-lock.sh
+
+WG_IF="wg0"
+VPN_DNS="10.2.0.1"
+TEMP_DNS="1.1.1.1"
+WAIT_TIMEOUT=15
+
+# 1. Set temporary DNS to bootstrap VPN
+echo "nameserver $TEMP_DNS" > /etc/resolv.conf
+echo "[INFO] Temporary DNS $TEMP_DNS set."
+
+# 2. Bring up WireGuard if not already up
+if ! wg show $WG_IF &>/dev/null; then
+    echo "[INFO] Bringing up WireGuard interface $WG_IF..."
+    wg-quick up $WG_IF
+fi
+
+# 3. Wait until VPN DNS responds
+echo "[INFO] Waiting for VPN DNS $VPN_DNS..."
+for i in $(seq 1 $WAIT_TIMEOUT); do
+    if dig @"$VPN_DNS" google.com +short &>/dev/null; then
+        echo "[INFO] VPN DNS reachable!"
+        break
+    fi
+    sleep 1
+done
+
+# 4. Switch resolv.conf to VPN DNS
+echo "nameserver $VPN_DNS" > /etc/resolv.conf
+echo "[INFO] Switched to VPN DNS $VPN_DNS."
+
+# 5. Apply DNS leak protection
+iptables -C OUTPUT ! -d $VPN_DNS -p udp --dport 53 -j REJECT 2>/dev/null || \
+iptables -I OUTPUT ! -d $VPN_DNS -p udp --dport 53 -j REJECT
+iptables -C OUTPUT ! -d $VPN_DNS -p tcp --dport 53 -j REJECT 2>/dev/null || \
+iptables -I OUTPUT ! -d $VPN_DNS -p tcp --dport 53 -j REJECT
+echo "[INFO] DNS leak protection applied."
+```
+
+Then, make it executable:
+
+```
+sudo chmod +x /usr/local/bin/vpn-dns-lock.sh
+```
+(3). Prevent Systemd-Resolved from overwriting DNS:
+
+Enter:
+```
+chattr +i /etc/resolv.conf
+```
+
+(4). Create a Systemd Service:
+Enter:
+```
+sudo nano /etc/systemd/system/vpn-dns-lock.service
+```
+
+Then paste in:
+
+```
+# /etc/systemd/system/vpn-dns-lock.service
+[Unit]
+Description=VPN DNS Lock
+After=network-online.target wg-quick@wg0.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/vpn-dns-lock.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+```
+Enable and start (automatically start on every boot):
+```
+sudo systemctl enable vpn-dns-lock.service
+sudo systemctl start vpn-dns-lock.service
+```
+
+What this ensures against:
+✔ DNS leaks
+✔ LXC trying to use LAN DNS during boot
+✔ Apps resolving via host (Proxmox) DNS
+✔ Fallback DNS hijacking
+✔ Fail-open scenarios when VPN temporarily drops
+
 
 6. Final test for any DNS / IP Leaks from both containers:
 
