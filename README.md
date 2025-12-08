@@ -88,10 +88,10 @@ Streaming addon geolocation freedom
   -> Install Fail2Ban: https://github.com/fail2ban/fail2ban
   -> Set up automatic updating:
 
-  '''
+```
 apt install unattended-upgrades
 dpkg-reconfigure --priority=low unattended-upgrades
-'''
+```
 
   -> Set up Tailscale and follow the steps to set up a remote connection: https://tailscale.com/kb/1174/install-debian-bookworm
 
