@@ -81,25 +81,65 @@ Streaming addon geolocation freedom
 
 ## 4.📋Setup Summary
 
-- Install Proxmox and configure secure defaults
+1️⃣ Install Proxmox and configure secure defaults
 
-- Create VPN LXC (Debian)
+  -> Create a User
+  -> update and install repositories
+  -> Install Fail2Ban: https://github.com/fail2ban/fail2ban
+  -> Set up automatic updating:
 
-- Install and configure the VPN client (Wireguard using a ProtonVPN subscription)
+  '''
+apt install unattended-upgrades
+dpkg-reconfigure --priority=low unattended-upgrades
+'''
 
-- Create internal bridge (vmbr99) for isolated routing between both LXCs
+  -> Set up Tailscale and follow the steps to set up a remote connection: https://tailscale.com/kb/1174/install-debian-bookworm
 
-- Create a Stremio LXC attached to the private VPN bridge, disable outbound internet connectivity
+      
+2️⃣ Create VPN LXC (Debian)
 
-- Run Stremio Docker container
+- Install Wireguard and edit the config file (e.g ProtonVPN)
 
-- Configure routing so Stremio uses the VPN as its gateway
+- Create internal bridge (vmbr99) for isolated routing between both LXCs and one for it so be reached on the network.
+  -> Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24
+  -> Make it static
 
-- Test: verify Stremio has only VPN-based internet access
+  My Network interfaces for this VPN LXC are:
+  
+  Network Adress of the VPN LXC (static):
+  -> Name: eth0
+  -> Bridge: vmbr0
+  -> IPv4/CIDR:192.168.0.28/24
+  -> Gateway (IPv4): 192.168.0.1
 
-- Harden the system with firewall rules and access control + configure NAT and disable IPv6
+  Bridged Network to Stremio (static):
+  -> Name: eth1
+  -> Bridge: vmbr99
+  -> IPv4/CIDR: 192.168.99.1/24
+  NO GATEWAY
 
-- Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)
+3️⃣ Create a Stremio LXC attached to the private VPN bridge and one network to stream locally.
+
+  My Network interfaces for this Stremio  LXC are:
+  Network Adress of the LXC (static):
+  -> Name: eth0
+  -> Bridge: vmbr0
+  -> IPv4/CIDR: 192.168.0.29/24
+  NO GATEWAY
+  
+  Bridged Network to VPN (static):
+  -> Name: eth1
+  -> Bridge: vmbr99
+  -> IPv4/CIDR:192.168.99.2/24
+  -> Gateway (IPv4):192.168.99.1
+
+4️⃣ Run Stremio Docker container: https://github.com/Stremio/server-docker
+
+5️⃣ Test: verify Stremio has only VPN-based internet access
+
+6️⃣ Harden the system with firewall rules and access control + configure NAT and disable IPv6
+
+7️⃣ Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)
 
 
 ## 5.🗒️Systemd Auto-Start Integration
