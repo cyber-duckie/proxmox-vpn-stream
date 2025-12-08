@@ -107,10 +107,10 @@ dpkg-reconfigure --priority=low unattended-upgrades
   My Network interfaces for this VPN LXC are:
   
   Network Adress of the VPN LXC (static):
-  -> Name: eth0
-  -> Bridge: vmbr0
-  -> IPv4/CIDR:192.168.0.28/24
-  -> Gateway (IPv4): 192.168.0.1
+  -> Name: eth0<br/>
+  -> Bridge: vmbr0<br/>
+  -> IPv4/CIDR:192.168.0.28/24<br/>
+  -> Gateway (IPv4): 192.168.0.1<br/>
 
   Bridged Network to Stremio (static):
   -> Name: eth1
