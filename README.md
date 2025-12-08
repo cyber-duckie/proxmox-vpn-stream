@@ -295,6 +295,77 @@ Then a quick check using an online IP lookup tool:
 
 It works! All routing goes through my VPN including any DNS queries!
 
+##8. Final checks / hardening
+
+- Harden kernel sysctls
+```
+cat <<EOF >> /etc/sysctl.conf
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+EOF
+
+sysctl -p
+```
+
+- Check if Tailscale is active
+```
+tailscale status
+```
+Look for:
+
+Your host device name
+
+Correct 100.x.x.x IP
+
+Online state
+
+- Check open ports
+```
+- ss -tuln
+```
+
+Expected outoput:
+
+8006 (web GUI)
+
+22 (SSH – ideally LAN only)
+
+3128 (only if using proxy)
+
+tailscaled (port 41641/udp)
+
+Maybe VPN LXC bridges
+
+- Check if unattended-upgrades is installed
+```
+systemctl status unattended-upgrades
+```
+
+Look for:
+Active: active (running)
+
+- Check AppArmor security
+```
+aa-status
+```
+
+- Check if Proxmox enterprise repo is removed / disabled
+```
+cat /etc/apt/sources.list.d/pve-enterprise.list
+```
+
+
+It should be commented out:
+#deb https://enterprise.proxmox.com ...
+
+- Check your firewall drop policy:
+```
+grep policy /etc/pve/firewall/cluster.fw
+grep policy /etc/pve/nodes/$(hostname)/host.fw
+```
+
 ## 8. Future Expansion
 
 The architecture supports adding more containers, such as:
