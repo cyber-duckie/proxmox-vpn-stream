@@ -19,7 +19,7 @@ The goal of the project was to build a privacy-focused streaming and automation 
 
 This Github Project aims to give others a guide on how to setup such a streaming server and for myself as a repository to copy the code if i want to replicate this server for other relatives with ease without having to rebuild and reconfigure everything from scratch.
 
-## 2. Architecture Diagram (ASCII)
+## 2. 🖼️Architecture Diagram (ASCII)
 ```
                 ┌─────────────────────────┐
                 │     Proxmox Host        │   <--- VPN Connection via Tailscale
@@ -79,7 +79,7 @@ Enforced privacy
 Streaming addon geolocation freedom
 
 
-## 4. Setup Summary
+## 4.📋Setup Summary
 
 - Install Proxmox and configure secure defaults
 
@@ -102,7 +102,7 @@ Streaming addon geolocation freedom
 - Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)
 
 
-## 5. Systemd Auto-Start Integration
+## 5.🗒️Systemd Auto-Start Integration
 
 The following will show the steps I took to make a custom script that automatically runs on every boot. It ensures:
 
@@ -221,7 +221,7 @@ What this ensures against:
 ✔ Fallback DNS hijacking
 ✔ Fail-open scenarios when VPN temporarily drops
 
-## 6. Set up a hardened Firewall to:
+## 6. 🧱🛡️Set up a hardened Firewall to:
 
 
 - General Policy: Drop all inbound traffic by default; allow only explicitly defined connections.
@@ -233,7 +233,7 @@ Important here is to keep the Block all other connections as the very last rule 
 
 
 
-## 7. Final test for any DNS / IP Leaks from both containers:
+## 7. ✅Final test for any DNS / IP Leaks from both containers:
 
 ![Testing VPN](contentimages/vpn-lxc-test.png)
 
