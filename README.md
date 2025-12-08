@@ -107,7 +107,7 @@ Install Wireguard and edit the config file (e.g ProtonVPN)
 Create internal bridge (vmbr99) for isolated routing between both LXCs and one for it so be reached on the network.
 
 > [!NOTE]
-> Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24
+> Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24<br/>
 > Make it static
 
 
