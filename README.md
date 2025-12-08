@@ -105,8 +105,11 @@ dpkg-reconfigure --priority=low unattended-upgrades
 Install Wireguard and edit the config file (e.g ProtonVPN)
 
 Create internal bridge (vmbr99) for isolated routing between both LXCs and one for it so be reached on the network.
-  -> Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24
-  -> Make it static
+
+> [!NOTE]
+> Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24
+> Make it static
+
 
 My Network interfaces for this VPN LXC are:<br/>
   
@@ -274,7 +277,10 @@ What this ensures against:
 ![Firewall Rules](contentimages/Firewallrules.png)
 
 Apply the above shown Firewall rules on the Host-level under Proxmox->Firewall->Add.
-Important here is to keep the Block all other connections as the very last rule to avoid locking yourtself out!
+
+> [!IMPORTANT]
+> Important here is to keep the Block all other connections as the very last rule to avoid locking yourtself out!
+
 
 
 
