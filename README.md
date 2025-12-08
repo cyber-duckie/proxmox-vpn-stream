@@ -1,5 +1,5 @@
 # Hardened Home Server Setup (Proxmox + VPN Streaming + Modular LXC Stack)
-1. 📦 Overview
+## ** ** 1. 📦 Overview
 
 This project documents a hardened, media streaming server that uses Stremio which I built as a gift.
 The system is designed for security, modularity, and expandability, using Proxmox VE as the hypervisor.
