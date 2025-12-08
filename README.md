@@ -112,7 +112,7 @@ dpkg-reconfigure --priority=low unattended-upgrades
   -> IPv4/CIDR:192.168.0.28/24<br/>
   -> Gateway (IPv4): 192.168.0.1<br/>
 
-  Bridged Network to Stremio (static):
+  Bridged Network to Stremio (static):<br/>
   -> Name: eth1<br/>
   -> Bridge: vmbr99<br/>
   -> IPv4/CIDR: 192.168.99.1/24<br/>
@@ -120,7 +120,7 @@ dpkg-reconfigure --priority=low unattended-upgrades
 
 3️⃣ Create a Stremio LXC attached to the private VPN bridge and one network to stream locally.
 
-  My Network interfaces for this Stremio  LXC are:
+  My Network interfaces for this Stremio  LXC are:<br/>
   Network Adress of the LXC (static):<br/>
   -> Name: eth0<br/>
   -> Bridge: vmbr0<br/>
