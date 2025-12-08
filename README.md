@@ -83,10 +83,10 @@ Streaming addon geolocation freedom
 
 1️⃣ Install Proxmox and configure secure defaults
 
-  -> Create a User
-  -> update and install repositories
-  -> Install Fail2Ban: https://github.com/fail2ban/fail2ban
-  -> Set up automatic updating:
+  -> Create a User<br/>
+  -> update and install repositories<br/>
+  -> Install Fail2Ban: https://github.com/fail2ban/fail2ban<br/>
+  -> Set up automatic updating:<br/>
 
 ```
 apt install unattended-upgrades
@@ -98,13 +98,13 @@ dpkg-reconfigure --priority=low unattended-upgrades
       
 2️⃣ Create VPN LXC (Debian)
 
-- Install Wireguard and edit the config file (e.g ProtonVPN)
+Install Wireguard and edit the config file (e.g ProtonVPN)
 
-- Create internal bridge (vmbr99) for isolated routing between both LXCs and one for it so be reached on the network.
+Create internal bridge (vmbr99) for isolated routing between both LXCs and one for it so be reached on the network.
   -> Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24
   -> Make it static
 
-  My Network interfaces for this VPN LXC are:<br/>
+My Network interfaces for this VPN LXC are:<br/>
   
   Network Adress of the VPN LXC (static):<br/>
   -> Name: eth0<br/>
@@ -120,7 +120,8 @@ dpkg-reconfigure --priority=low unattended-upgrades
 
 3️⃣ Create a Stremio LXC attached to the private VPN bridge and one network to stream locally.
 
-  My Network interfaces for this Stremio  LXC are:<br/>
+  My Network interfaces for this Stremio LXC are:<br/>
+  
   Network Adress of the LXC (static):<br/>
   -> Name: eth0<br/>
   -> Bridge: vmbr0<br/>
