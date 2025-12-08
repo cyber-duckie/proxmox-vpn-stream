@@ -1,8 +1,9 @@
 # Hardened Home Server Setup (Proxmox + VPN Streaming + Modular LXC Stack)
 
 ## Content:
-1. <Overview="(https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)"></a>
-2. <Architecture Diagram (ASCII)="(https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)"></a>
+1.[Overview](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)
+2.[Architecture Diagram (ASCII)](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)
+3.
 
 ## 1. 📦 Overview
 
