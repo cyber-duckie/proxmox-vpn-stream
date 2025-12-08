@@ -104,34 +104,34 @@ dpkg-reconfigure --priority=low unattended-upgrades
   -> Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24
   -> Make it static
 
-  My Network interfaces for this VPN LXC are:
+  My Network interfaces for this VPN LXC are:<br/>
   
-  Network Adress of the VPN LXC (static):
+  Network Adress of the VPN LXC (static):<br/>
   -> Name: eth0<br/>
   -> Bridge: vmbr0<br/>
   -> IPv4/CIDR:192.168.0.28/24<br/>
   -> Gateway (IPv4): 192.168.0.1<br/>
 
   Bridged Network to Stremio (static):
-  -> Name: eth1
-  -> Bridge: vmbr99
-  -> IPv4/CIDR: 192.168.99.1/24
-  NO GATEWAY
+  -> Name: eth1<br/>
+  -> Bridge: vmbr99<br/>
+  -> IPv4/CIDR: 192.168.99.1/24<br/>
+  NO GATEWAY<br/>
 
 3️⃣ Create a Stremio LXC attached to the private VPN bridge and one network to stream locally.
 
   My Network interfaces for this Stremio  LXC are:
-  Network Adress of the LXC (static):
-  -> Name: eth0
-  -> Bridge: vmbr0
-  -> IPv4/CIDR: 192.168.0.29/24
-  NO GATEWAY
+  Network Adress of the LXC (static):<br/>
+  -> Name: eth0<br/>
+  -> Bridge: vmbr0<br/>
+  -> IPv4/CIDR: 192.168.0.29/24<br/>
+  NO GATEWAY<br/>
   
-  Bridged Network to VPN (static):
-  -> Name: eth1
-  -> Bridge: vmbr99
-  -> IPv4/CIDR:192.168.99.2/24
-  -> Gateway (IPv4):192.168.99.1
+  Bridged Network to VPN (static):<br/>
+  -> Name: eth1<br/>
+  -> Bridge: vmbr99<br/>
+  -> IPv4/CIDR:192.168.99.2/24<br/>
+  -> Gateway (IPv4):192.168.99.1<br/>
 
 4️⃣ Run Stremio Docker container: https://github.com/Stremio/server-docker
 
