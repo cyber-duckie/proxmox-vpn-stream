@@ -226,51 +226,11 @@ What this ensures against:
 
 - General Policy: Drop all inbound traffic by default; allow only explicitly defined connections.
 
-Tailscale Access:
+![Firewall Rules](contentimages/Firewallrules.png)
 
-- Allow inbound TCP/UDP from Tailscale subnet (100.64.0.0/10) to the host.
+Apply the above shown Firewall rules on the Host-level under Proxmox->Firewall->Add.
+Important here is to keep the Block all other connections as the very last rule to avoid locking yourtself out!
 
-- Allow outbound TCP/UDP to Tailscale subnet.
-
-- Preserve Tailscale connectivity even when firewall restarts.
-
-Proxmox GUI (Port 8006):
-
-- Allow inbound TCP from LAN (192.168.0.0/24) and Tailscale (100.64.0.0/10) only.
-
-- Drop all other access to port 8006.
-
-Stremio (Port 8080) & Netdata (Port 19999):
-
-- Allow inbound TCP from LAN (192.168.0.0/24) only.
-
-DNS Resolution:
-
-- Allow outbound TCP/UDP to:
-
-- Cloudflare DNS: 1.1.1.1
-
-- VPN DNS: 10.2.0.1
-
-VPN / LXC Routing:
-
-- Allow ProtonVPN LXC to forward packets as needed.
-
-- Allow Stremio LXC traffic routed via VPN LXC.
-
-Host Security:
-
-- Allow loopback interface.
-
-- Allow established and related connections.
-
-- Drop all other inbound traffic.
-
-Apply following Firewall rules on the Host-level in following order under Proxmox->Firewall->Add:
-
-XXXXXX
-XXXXX
-XXXXX
 
 
 ## 7. Final test for any DNS / IP Leaks from both containers:
