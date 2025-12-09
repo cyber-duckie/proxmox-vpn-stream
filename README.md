@@ -271,12 +271,12 @@ sudo systemctl enable vpn-dns-lock.service
 sudo systemctl start vpn-dns-lock.service
 ```
 
-What this ensures against:
-✔ DNS leaks
-✔ LXC trying to use LAN DNS during boot
-✔ Apps resolving via host (Proxmox) DNS
-✔ Fallback DNS hijacking
-✔ Fail-open scenarios when VPN temporarily drops
+What this ensures against:<br/><br/>
+✔ DNS leaks<br/>
+✔ LXC trying to use LAN DNS during boot<br/>
+✔ Apps resolving via host (Proxmox) DNS<br/>
+✔ Fallback DNS hijacking<br/>
+✔ Fail-open scenarios when VPN temporarily drops<br/>
 
 ## 6. 🧱🛡️Set up a hardened Firewall to:
 
@@ -315,6 +315,7 @@ sysctl net.ipv4.conf.all.rp_filter
 sysctl net.ipv4.conf.all.accept_redirects
 sysctl net.ipv4.conf.all.send_redirects
 ```
+<br/>
 
 Harden with;
 ```
@@ -327,21 +328,27 @@ EOF
 
 sysctl -p
 ```
+<br/>
 
 - Check if Tailscale is active
 ```
 tailscale status
 ```
+<br/>
 Look for:
 
 Your host device name
 
 Correct 100.x.x.x IP
 
+<br/>
+
 - Check open ports;
 ```
 - ss -tuln
 ```
+
+<br/>
 
 Expected outoput:
 
@@ -355,11 +362,15 @@ tailscaled (port 41641/udp)
 
 Maybe VPN LXC bridges
 
+<br/>
+
 - Check SSH security:
   Check SSH config;
 ```
 grep -E "PermitRootLogin|PasswordAuthentication" /etc/ssh/sshd_config
 ```
+
+<br/>
 
   Ideally should show:
 
@@ -367,18 +378,28 @@ grep -E "PermitRootLogin|PasswordAuthentication" /etc/ssh/sshd_config
 PermitRootLogin no
 PasswordAuthentication no
 ```
+
+<br/>
+
   Check if SSH is listening on the LAN only:
 ```
 ss -tulpn | grep ssh
 ```
+
+<br/>
+
 > [!IMPORTANT]
 > If you get 0.0.0.0:22, it means SSH is listening on all interfaces
 > Should be restricted to LAN or to LAN + Tailscale only
+
+<br/>
 
   If it is listening on all interfaces; change with:
 ```
 nano /etc/ssh/sshd_config
 ```
+
+<br/>
 
 Then add/ replace with:
 ```
@@ -386,15 +407,21 @@ ListenAddress 192.168.0.10   # LAN IP
 ListenAddress 100.x.x.x      # Proxmox's own Tailscale IP
 ```
 
+<br/>
+
 Finally, restart the ssh daemon:
 ```
 systemctl restart sshd
 ```
 
+<br/>
+
 - Check if unattended-upgrades is installed
 ```
 systemctl status unattended-upgrades
 ```
+
+<br/>
 
 Look for:
 Active: active (running)
