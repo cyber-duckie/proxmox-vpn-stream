@@ -119,8 +119,30 @@ sudo apt clean
 
 <br/>
 
-  -> Install Fail2Ban: https://github.com/fail2ban/fail2ban<br/>
-  
+  -> Install Fail2Ban: (https://github.com/fail2ban/fail2ban)<br/>
+
+<br/>
+
+```
+sudo apt install -y fail2ban
+```
+<br/>
+
+Enable and start the service:
+```
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+```
+
+<br/>
+
+Check with:
+```
+sudo systemctl status fail2ban
+```
+
+<br/>
+
   -> Set up automatic updating:<br/>
 
 ```
