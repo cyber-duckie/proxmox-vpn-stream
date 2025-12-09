@@ -94,11 +94,23 @@ Streaming addon geolocation freedom
 
 ## 4.📋Setup Summary
 
-1️⃣ Install Proxmox and configure secure defaults
+1️⃣ **Install Proxmox and configure secure defaults**
 
-  -> Create a User<br/>
-  -> update and install repositories<br/>
+  -> Create a Sudo User<br/>
+  
+  -> Disable enterprise repos<br/>
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PICTURE
+
+<br/>
+  -> Update and install repositories:
+
+  ```
+  sudo apt update && install
+  ```
+<br/>
+
   -> Install Fail2Ban: https://github.com/fail2ban/fail2ban<br/>
+  
   -> Set up automatic updating:<br/>
 
 ```
@@ -107,9 +119,9 @@ dpkg-reconfigure --priority=low unattended-upgrades
 ```
 
   -> Set up Tailscale and follow the steps to set up a remote connection: https://tailscale.com/kb/1174/install-debian-bookworm
+<br/>
 
-      
-2️⃣ Create VPN LXC (Debian)
+2️⃣ **Create VPN LXC (Debian)**
 
 Install Wireguard and edit the config file (e.g ProtonVPN)
 
@@ -119,14 +131,16 @@ Create internal bridge (vmbr99) for isolated routing between both LXCs and one f
 > Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24<br/>
 > Make it static
 
-
+<br/>
 My Network interfaces for this VPN LXC are:<br/>
-  
+ 
   Network Adress of the VPN LXC (static):<br/>
   -> Name: eth0<br/>
   -> Bridge: vmbr0<br/>
   -> IPv4/CIDR:192.168.0.28/24<br/>
   -> Gateway (IPv4): 192.168.0.1<br/>
+
+<br/>
 
   Bridged Network to Stremio (static):<br/>
   -> Name: eth1<br/>
@@ -134,7 +148,9 @@ My Network interfaces for this VPN LXC are:<br/>
   -> IPv4/CIDR: 192.168.99.1/24<br/>
   NO GATEWAY<br/>
 
-3️⃣ Create a Stremio LXC attached to the private VPN bridge and one network to stream locally.
+<br/>
+
+3️⃣ **Create a Stremio LXC attached to the private VPN bridge and one network to stream locally**
 
   My Network interfaces for this Stremio LXC are:<br/>
   
@@ -143,6 +159,8 @@ My Network interfaces for this VPN LXC are:<br/>
   -> Bridge: vmbr0<br/>
   -> IPv4/CIDR: 192.168.0.29/24<br/>
   NO GATEWAY<br/>
+
+  <br/>
   
   Bridged Network to VPN (static):<br/>
   -> Name: eth1<br/>
@@ -150,13 +168,23 @@ My Network interfaces for this VPN LXC are:<br/>
   -> IPv4/CIDR:192.168.99.2/24<br/>
   -> Gateway (IPv4):192.168.99.1<br/>
 
-4️⃣ Run Stremio Docker container: https://github.com/Stremio/server-docker
+<br/>
 
-5️⃣ Test: verify Stremio has only VPN-based internet access
+4️⃣ **Run Stremio Docker container: https://github.com/Stremio/server-docker**
 
-6️⃣ Harden the system with firewall rules and access control + configure NAT and disable IPv6
 
-7️⃣ Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)
+> [!NOTE]
+> Docker must be installed first:
+> https://docs.docker.com/engine/install/debian/
+
+<br/>
+
+
+5️⃣ **Test: verify Stremio has only VPN-based internet access**
+
+6️⃣ **Harden the system with firewall rules and access control + configure NAT and disable IPv6**
+
+7️⃣ **Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)**
 
 
 ## 5.🗒️Systemd Auto-Start Integration
@@ -181,14 +209,22 @@ This tutorial assumes:
 
 - Temporary DNS for bootstrapping: 1.1.1.1 (cloudflare)
 
+<br/>
+
 (1). Create the VPN bootstrap script
 Inside the VPN LXC, create:
+
+<br/>
 
 ```
 sudo nano /usr/local/bin/vpn-dns-lock.sh
 ```
 
+<br/>
+
 (2). Enter the following script:
+<br/>
+
 ```
 #!/bin/bash
 # vpn-dns-lock.sh
@@ -230,23 +266,35 @@ iptables -I OUTPUT ! -d $VPN_DNS -p tcp --dport 53 -j REJECT
 echo "[INFO] DNS leak protection applied."
 ```
 
+<br/>
+
 Then, make it executable:
+
+<br/>
 
 ```
 sudo chmod +x /usr/local/bin/vpn-dns-lock.sh
 ```
+<br/>
+
 (3). Prevent Systemd-Resolved from overwriting DNS:
+
+<br/>
 
 Enter:
 ```
 chattr +i /etc/resolv.conf
 ```
 
+<br/>
+
 (4). Create a Systemd Service:
 Enter:
 ```
 sudo nano /etc/systemd/system/vpn-dns-lock.service
 ```
+
+<br/>
 
 Then paste in:
 
@@ -265,6 +313,9 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 ```
+
+<br/>
+
 Enable and start (automatically start on every boot):
 ```
 sudo systemctl enable vpn-dns-lock.service
@@ -277,6 +328,8 @@ What this ensures against:<br/><br/>
 ✔ Apps resolving via host (Proxmox) DNS<br/>
 ✔ Fallback DNS hijacking<br/>
 ✔ Fail-open scenarios when VPN temporarily drops<br/>
+
+<br/>
 
 ## 6. 🧱🛡️Set up a hardened Firewall to:
 
