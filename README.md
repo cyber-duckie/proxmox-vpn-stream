@@ -2,11 +2,11 @@
 
 ## Content:
 1.[Overview](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
-2.[Architecture Diagram (ASCII)](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
-3.[How it works](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
-3.[Setup Summary](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
-3.[Systemd Auto-Start Integration](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
-3.[Setting up a hardened Firewall](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
+2.[Architecture Diagram (ASCII)](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--architecture-diagram-ascii)<br/>
+3.[How it works](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--how-it-works)<br/>
+3.[Setup Summary](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--setup-summary)<br/>
+3.[Systemd Auto-Start Integration](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--systemd-auto-start-integration)<br/>
+3.[Setting up a hardened Firewall](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--setting-up-a-hardened-firewall)<br/>
 3.[Architecture Diagram (ASCII)](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
 3.[Architecture Diagram (ASCII)](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
 
@@ -304,9 +304,19 @@ Then a quick check using an online IP lookup tool:
 
 It works! All routing goes through my VPN including any DNS queries!
 
-##8. Final checks / hardening
+## 8. Final checks / hardening
 
 - Harden kernel sysctls
+
+  Check current sysctls:
+```
+sysctl net.ipv4.ip_forward
+sysctl net.ipv4.conf.all.rp_filter
+sysctl net.ipv4.conf.all.accept_redirects
+sysctl net.ipv4.conf.all.send_redirects
+```
+
+Harden with;
 ```
 cat <<EOF >> /etc/sysctl.conf
 net.ipv4.conf.all.accept_redirects = 0
@@ -328,9 +338,7 @@ Your host device name
 
 Correct 100.x.x.x IP
 
-Online state
-
-- Check open ports
+- Check open ports;
 ```
 - ss -tuln
 ```
@@ -346,6 +354,42 @@ Expected outoput:
 tailscaled (port 41641/udp)
 
 Maybe VPN LXC bridges
+
+- Check SSH security:
+  Check SSH config;
+```
+grep -E "PermitRootLogin|PasswordAuthentication" /etc/ssh/sshd_config
+```
+
+  Ideally should show:
+
+```
+PermitRootLogin no
+PasswordAuthentication no
+```
+  Check if SSH is listening on the LAN only:
+```
+ss -tulpn | grep ssh
+```
+> [!IMPORTANT]
+> If you get 0.0.0.0:22, it means SSH is listening on all interfaces
+> Should be restricted to LAN or to LAN + Tailscale only
+
+  If it is listening on all interfaces; change with:
+```
+nano /etc/ssh/sshd_config
+```
+
+Then add/ replace with:
+```
+ListenAddress 192.168.0.10   # LAN IP
+ListenAddress 100.x.x.x      # Proxmox's own Tailscale IP
+```
+
+Finally, restart the ssh daemon:
+```
+systemctl restart sshd
+```
 
 - Check if unattended-upgrades is installed
 ```
@@ -367,7 +411,9 @@ cat /etc/apt/sources.list.d/pve-enterprise.list
 
 
 It should be commented out:
-#deb https://enterprise.proxmox.com ...
+```
+# deb https://enterprise.proxmox.com ...
+```
 
 - Check your firewall drop policy:
 ```
