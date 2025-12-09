@@ -105,8 +105,18 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PICTURE
   -> Update and install repositories:
 
   ```
-  sudo apt update && install
+  sudo apt update
+  sudo apt full-upgrade -y
   ```
+<br/>
+
+Optional: Clean unused old repos:
+
+```
+sudo apt autoremove -y
+sudo apt clean
+```
+
 <br/>
 
   -> Install Fail2Ban: https://github.com/fail2ban/fail2ban<br/>
@@ -117,6 +127,8 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PICTURE
 apt install unattended-upgrades
 dpkg-reconfigure --priority=low unattended-upgrades
 ```
+
+<br/>
 
   -> Set up Tailscale and follow the steps to set up a remote connection: https://tailscale.com/kb/1174/install-debian-bookworm
 <br/>
