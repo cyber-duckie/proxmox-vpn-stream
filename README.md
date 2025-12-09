@@ -98,8 +98,9 @@ Streaming addon geolocation freedom
 
   -> Create a Sudo User<br/>
   
-  -> Disable enterprise repos<br/>
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX PICTURE
+  -> Disable enterprise repos
+  <br/>
+Datacenter -> Proxmox -> Repositories -> (under the 'Components' section) Diasable all Repositories with 'enterprise' or 'pve-enterprise'
 
 <br/>
   -> Update and install repositories:
@@ -156,6 +157,22 @@ dpkg-reconfigure --priority=low unattended-upgrades
 <br/>
 
 2️⃣ **Create VPN LXC (Debian)**
+
+Settings for my VPN LXC:
+
+
+
+| Setting       | Value         |
+| ------------- | ------------- |
+| Cores         | 1             |
+| RAM           | 1 GB          |
+| Storage       | 20 GB         |
+| OS Type       | Debian 64     |
+| Unprivileged  | NO            |
+| Privileged    | YES           |
+| Start at boot | YES           |
+
+
 
 Install Wireguard and edit the config file (e.g ProtonVPN)
 
