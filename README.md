@@ -133,6 +133,8 @@ Create internal bridge (vmbr99) for isolated routing between both LXCs and one f
 
 <br/>
 My Network interfaces for this VPN LXC are:<br/>
+
+![Eth0_Network-VPN](contentimages/eth0vpn.png)
  
   Network Adress of the VPN LXC (static):<br/>
   -> Name: eth0<br/>
@@ -142,6 +144,8 @@ My Network interfaces for this VPN LXC are:<br/>
 
 <br/>
 
+  ![Eth1_Network-VPN](contentimages/eth1vpn.png)
+  
   Bridged Network to Stremio (static):<br/>
   -> Name: eth1<br/>
   -> Bridge: vmbr99<br/>
@@ -153,6 +157,8 @@ My Network interfaces for this VPN LXC are:<br/>
 3️⃣ **Create a Stremio LXC attached to the private VPN bridge and one network to stream locally**
 
   My Network interfaces for this Stremio LXC are:<br/>
+
+![Eth0_Network-Stremio](contentimages/eth0stremio.png)
   
   Network Adress of the LXC (static):<br/>
   -> Name: eth0<br/>
@@ -161,7 +167,9 @@ My Network interfaces for this VPN LXC are:<br/>
   NO GATEWAY<br/>
 
   <br/>
-  
+
+![Eth1_Network-Stremio](contentimages/eth1stremio.png)
+
   Bridged Network to VPN (static):<br/>
   -> Name: eth1<br/>
   -> Bridge: vmbr99<br/>
