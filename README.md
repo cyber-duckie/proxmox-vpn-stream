@@ -136,21 +136,11 @@ My Network interfaces for this VPN LXC are:<br/>
 
 ![Eth0_Network-VPN](contentimages/eth0vpn.png)
  
-  Network Adress of the VPN LXC (static):<br/>
-  -> Name: eth0<br/>
-  -> Bridge: vmbr0<br/>
-  -> IPv4/CIDR:192.168.0.28/24<br/>
-  -> Gateway (IPv4): 192.168.0.1<br/>
 
 <br/>
 
   ![Eth1_Network-VPN](contentimages/eth1vpn.png)
-  
-  Bridged Network to Stremio (static):<br/>
-  -> Name: eth1<br/>
-  -> Bridge: vmbr99<br/>
-  -> IPv4/CIDR: 192.168.99.1/24<br/>
-  NO GATEWAY<br/>
+
 
 <br/>
 
@@ -160,21 +150,11 @@ My Network interfaces for this VPN LXC are:<br/>
 
 ![Eth0_Network-Stremio](contentimages/eth0stremio.png)
   
-  Network Adress of the LXC (static):<br/>
-  -> Name: eth0<br/>
-  -> Bridge: vmbr0<br/>
-  -> IPv4/CIDR: 192.168.0.29/24<br/>
-  NO GATEWAY<br/>
 
   <br/>
 
 ![Eth1_Network-Stremio](contentimages/eth1stremio.png)
 
-  Bridged Network to VPN (static):<br/>
-  -> Name: eth1<br/>
-  -> Bridge: vmbr99<br/>
-  -> IPv4/CIDR:192.168.99.2/24<br/>
-  -> Gateway (IPv4):192.168.99.1<br/>
 
 <br/>
 
@@ -192,8 +172,55 @@ My Network interfaces for this VPN LXC are:<br/>
 
 6️⃣ **Harden the system with firewall rules and access control + configure NAT and disable IPv6**
 
+  Disable IPv6:
+
+  In both the VPN LXC and Stremio LXC, edit the /etc/sysctl.conf file:
+
+<br/>
+
+```
+sudo nano /etc/sysctl.conf
+```
+
+<br/>
+
+Add these lines:
+```
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+```
+<br/>
+
+- Any entries in the /etc/sysctl.conf file are applied automatically on boot.
+
+<br/>
+
+- Reload the sysctl settings:
+```
+sudo sysctl -p
+```
+
+<br/>
+
+Confirm with:
+
+
+```
+sysctl net.ipv6.conf.all.disable_ipv6
+sysctl net.ipv6.conf.default.disable_ipv6
+```
+
+<br/>
+
+- Should return '1'
+  
+
 7️⃣ **Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)**
 
+8️⃣ **Set the Start/ shutdown order to make sure the VPN LXC boots first, then Stremio second**
+    Uder each LXC in the Proxmox node -> Options -> Start/ Shutdown order -> Edit (VPN-LXC=1, Stremio-LXC=2)
+
+<br/>
 
 ## 5.🗒️Systemd Auto-Start Integration
 
