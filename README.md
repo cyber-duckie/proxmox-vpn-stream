@@ -96,21 +96,45 @@ Streaming addon geolocation freedom
 
 ### 1️⃣ Install Proxmox and configure secure defaults
 
-- Create a Sudo User<br/>
+- 🧑‍💻 Create a Sudo User<br/>
+
+```
+adduser newusername
+```
+You will be asked to generate a new password for this account.
+
+Add the user to the sudo group:
+
+```
+usermod -aG sudo newusername
+```
+
+Switch to the new user:
+
+```
+su - newusername
+```
+
+Test sudo privileges:
+
+```
+sudo whoami
+```
+
 
 <br/>
 
-- isable enterprise repos:
+- ❌ Disable enterprise repos:
 
 Datacenter -> Proxmox -> Repositories -> (under the 'Components' section) Diasable all Repositories with 'enterprise' or 'pve-enterprise'
 
 <br/>
 - Update and install repositories:
 
-  ```
+ ```
   sudo apt update
   sudo apt full-upgrade -y
-  ```
+ ```
 <br/>
 
 Optional: Clean unused old repos:
@@ -122,7 +146,7 @@ sudo apt clean
 
 <br/>
 
-- Install Fail2Ban: (https://github.com/fail2ban/fail2ban)<br/>
+- 🔒 Install Fail2Ban: (https://github.com/fail2ban/fail2ban)<br/>
 
 <br/>
 
@@ -131,7 +155,7 @@ sudo apt install -y fail2ban
 ```
 <br/>
 
-Enable and start the service:
+🔄 Enable and start the service:
 ```
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
@@ -146,7 +170,7 @@ sudo systemctl status fail2ban
 
 <br/>
 
-- Set up automatic updating:<br/>
+- 🔄 Set up automatic updating:<br/>
 
 ```
 apt install unattended-upgrades
@@ -155,7 +179,8 @@ dpkg-reconfigure --priority=low unattended-upgrades
 
 <br/>
 
-- Set up Tailscale and follow the steps to set up a remote connection: https://tailscale.com/kb/1174/install-debian-bookworm
+- 🔗 Set up Tailscale and follow the steps to set up a remote connection:
+  https://tailscale.com/kb/1174/install-debian-bookworm
 <br/>
 
 ### 2️⃣ Create VPN LXC (Debian)
@@ -174,6 +199,8 @@ Settings for my VPN LXC:
 | Privileged    | YES           |
 | Start at boot | YES           |
 
+> [!NOTE]
+> Make sure the VPN LXC is Privileged, otheriwse there will be routing issues<br/>
 
 
 Install Wireguard and edit the config file (e.g ProtonVPN)
