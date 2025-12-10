@@ -208,8 +208,9 @@ Settings for my VPN LXC:
 | Nameserver    | 1.1.1.1       |
 
 > [!NOTE]
-> Make sure the VPN LXC is Privileged, otheriwse there will be routing issues<br/>
+> Make sure the VPN LXC is Privileged, otheriwse there will be routing issues
 
+<br/>
 
 Install Wireguard and edit the config file (e.g ProtonVPN)
 
@@ -218,7 +219,7 @@ Create internal bridge (vmbr99) for isolated routing between both LXCs and one f
 <br/>
 
 > [!NOTE]
-> Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24<br/>
+> Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24
 > Make it static
 
 <br/>
