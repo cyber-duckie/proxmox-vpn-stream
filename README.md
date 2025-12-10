@@ -94,7 +94,7 @@ Streaming addon geolocation freedom
 
 ## 4.📋Setup Summary 🏗
 
-### 1️⃣ Install Proxmox and configure secure defaults
+### 4.1 Install Proxmox and configure secure defaults
 
 - 🧑‍💻 Create a Sudo User<br/>
 
@@ -183,7 +183,7 @@ dpkg-reconfigure --priority=low unattended-upgrades
   https://tailscale.com/kb/1174/install-debian-bookworm
 <br/>
 
-### 2️⃣ Create VPN LXC (Debian)
+### 4.2 Create VPN LXC (Debian)
 
 Settings for my VPN LXC:
 
@@ -226,7 +226,7 @@ My Network interfaces for this VPN LXC are:<br/>
 
 <br/>
 
-### 3️⃣ Create a Stremio LXC attached to the private VPN bridge and one network to stream locally
+### 4.3 Create a Stremio LXC attached to the private VPN bridge and one network to stream locally
 
   My Network interfaces for this Stremio LXC are:<br/>
 
@@ -240,7 +240,7 @@ My Network interfaces for this VPN LXC are:<br/>
 
 <br/>
 
-### 4️⃣ Install Docker and run the Stremio Server
+### 4.4 Install Docker and run the Stremio Server
 
 <br/>
 
@@ -300,7 +300,7 @@ e.g. 192.168.0.29:114770
 
 <br/>
  
-### 5️⃣ Harden the system with firewall rules and access control + configure NAT and disable IPv6
+### 4.5 Harden the system with firewall rules and access control + configure NAT and disable IPv6
 
   Disable IPv6:
 
@@ -477,7 +477,7 @@ netfilter-persistent save
 
 <br/>
 
-### 6️⃣ Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection
+### 4.6 Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection
 
 ⚙️**Systemd Auto-Start Integration**⚙️
 
@@ -624,10 +624,10 @@ What this ensures against:<br/><br/>
 <br/>
 
 
-### 7️⃣ Set the Start/ shutdown order to make sure the VPN LXC boots first, then Stremio second
+### 4.7 Set the Start/ shutdown order to make sure the VPN LXC boots first, then Stremio second
     Under each LXC in the Proxmox node -> Options -> Start/ Shutdown order -> Edit (VPN-LXC=1, Stremio-LXC=2)
 
-### 8️⃣ 🔥🧱Set up a hardened Firewall
+### 4.8 🔥🧱Set up a hardened Firewall
 
 
 - General Policy: Drop all inbound traffic by default; allow only explicitly defined connections.
