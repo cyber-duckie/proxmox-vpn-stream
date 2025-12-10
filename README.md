@@ -264,7 +264,138 @@ sysctl net.ipv6.conf.default.disable_ipv6
 <br/>
 
 - Should return '1'
-  
+
+
+### Set up NAT and IPv4 forwarding rules:
+
+<br/>
+
+> [!NOTE]
+> 🛠 Prerequisites for VPN & Stremio LXC Firewall
+> Before applying the firewall and NAT rules, make sure the following packages and services are installed and enabled in both LXC's:
+
+<br/>
+
+```
+# Update package lists
+sudo apt update
+
+# Install iptables, persistent rules, and nftables
+sudo apt install -y iptables iptables-persistent nftables
+
+# Enable and start persistent rule service
+sudo systemctl enable --now netfilter-persistent
+
+# Enable and start nftables service (optional, used by wg-quick chains)
+sudo systemctl enable --now nftables
+```
+
+<br/>
+
+**VPN-LXC:**
+
+<br/>
+
+📡 VPN LXC Firewall & NAT Rules
+
+These commands configure the VPN LXC to securely route traffic from other containers through WireGuard:
+
+Forward traffic between the host interface (eth1) and WireGuard (wg0).
+
+Masquerade (NAT) all container traffic so it exits via the VPN.
+
+Block DNS leaks by forcing DNS queries through the WireGuard server.
+
+Persist rules on boot using netfilter-persistent.
+
+Extra wg-quick nftables chains are automatically created to mark UDP packets and protect the WireGuard IP.
+
+IPv6 is disabled to prevent leaks, so no IPv6 rules are needed.
+
+<br/>
+📡 Set up NAT and IPv4 forwarding rules
+<br/>
+
+Allow forwarding between the LXC's network interface (replace eth1 with your actual interface name) and the WireGuard interface:
+```
+iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+```
+
+<br/>
+
+Enable IPv4 masquerading so all container traffic goes out through the VPN:
+```
+iptables -t nat -A POSTROUTING -s 192.168.99.0/24 -o wg0 -j MASQUERADE
+```
+
+<br/>
+
+⛔ DNS-blocking rule (to prevent DNS leaks). This ensures DNS is forced through the WireGuard server.
+
+```
+iptables -A OUTPUT -p tcp --dport 53 ! -d 10.2.0.1 -j REJECT
+iptables -A OUTPUT -p udp --dport 53 ! -d 10.2.0.1 -j REJECT
+```
+
+<br/>
+> [!NOTE]
+> No IPv6 rules are needed and can be skipped, because we disabled IPv6 completely already to avoid any leaks.
+
+<br/>
+
+💾 Make the rules persistent on boot
+
+```
+netfilter-persistent save
+```
+<br/>
+
+**Stremio-LXC:**
+
+📡 VPN and DNS Rules for Stremio LXC
+<br/>
+
+These commands configure the Stremio LXC to route all traffic through the WireGuard VPN and prevent DNS leaks:
+
+Forward traffic between the LXC’s network interface and the WireGuard interface.
+
+Masquerade (NAT) all container traffic so it exits via the VPN.
+
+Force DNS through the WireGuard server by rejecting any other DNS requests.
+
+Make rules persistent so they survive reboots.
+
+No IPv6 rules are needed since IPv6 is disabled to avoid leaks.
+
+<br/>
+Allow forwarding between Stremio LXC network and WireGuard
+
+```
+iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
+iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+```
+
+Masquerade (NAT) for IPv4. This ensures all traffic from your Stremio LXC goes out through the WireGuard VPN.
+
+```
+iptables -t nat -A POSTROUTING -s 192.168.99.0/24 -o wg0 -j MASQUERADE
+```
+
+⛔ DNS-blocking rule (to prevent DNS leaks). This ensures DNS is forced through the WireGuard server.
+
+```
+iptables -A OUTPUT -p tcp --dport 53 ! -d 10.2.0.1 -j REJECT
+iptables -A OUTPUT -p udp --dport 53 ! -d 10.2.0.1 -j REJECT
+```
+<br/>
+
+💾 Make the rules persistent on boot
+
+```
+netfilter-persistent save
+```
+
 
 7️⃣ **Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)**
 
