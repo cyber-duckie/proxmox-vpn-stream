@@ -96,14 +96,16 @@ Streaming addon geolocation freedom
 
 1️⃣ **Install Proxmox and configure secure defaults**
 
-  -> Create a Sudo User<br/>
-  
-  -> Disable enterprise repos
-  <br/>
+- Create a Sudo User<br/>
+
+<br/>
+
+- isable enterprise repos:
+
 Datacenter -> Proxmox -> Repositories -> (under the 'Components' section) Diasable all Repositories with 'enterprise' or 'pve-enterprise'
 
 <br/>
-  -> Update and install repositories:
+- Update and install repositories:
 
   ```
   sudo apt update
@@ -120,7 +122,7 @@ sudo apt clean
 
 <br/>
 
-  -> Install Fail2Ban: (https://github.com/fail2ban/fail2ban)<br/>
+- Install Fail2Ban: (https://github.com/fail2ban/fail2ban)<br/>
 
 <br/>
 
@@ -144,7 +146,7 @@ sudo systemctl status fail2ban
 
 <br/>
 
-  -> Set up automatic updating:<br/>
+- Set up automatic updating:<br/>
 
 ```
 apt install unattended-upgrades
@@ -153,7 +155,7 @@ dpkg-reconfigure --priority=low unattended-upgrades
 
 <br/>
 
-  -> Set up Tailscale and follow the steps to set up a remote connection: https://tailscale.com/kb/1174/install-debian-bookworm
+- Set up Tailscale and follow the steps to set up a remote connection: https://tailscale.com/kb/1174/install-debian-bookworm
 <br/>
 
 2️⃣ **Create VPN LXC (Debian)**
@@ -177,6 +179,8 @@ Settings for my VPN LXC:
 Install Wireguard and edit the config file (e.g ProtonVPN)
 
 Create internal bridge (vmbr99) for isolated routing between both LXCs and one for it so be reached on the network.
+
+<br/>
 
 > [!NOTE]
 > Choose an ip address that is free to act as the bridge, e.g. 192.168.99.1/24<br/>
@@ -209,19 +213,67 @@ My Network interfaces for this VPN LXC are:<br/>
 
 <br/>
 
-4️⃣ **Run Stremio Docker container: https://github.com/Stremio/server-docker**
-
-
-> [!NOTE]
-> Docker must be installed first:
-> https://docs.docker.com/engine/install/debian/
+4️⃣ **Install Docker and run the Stremio Server: https://github.com/Stremio/server-docker**
 
 <br/>
 
 
-5️⃣ **Test: verify Stremio has only VPN-based internet access**
+Install docker:
 
-6️⃣ **Harden the system with firewall rules and access control + configure NAT and disable IPv6**
+```
+sudo apt install -y docker.io
+```
+
+<br/>
+
+Enable and start the Docker service so it runs on boot:
+```
+sudo systemctl enable --now docker
+```
+<br/>
+
+
+Check that Docker is active:
+```
+sudo systemctl status docker
+```
+
+<br/>
+
+Then; pull the docker image:
+
+```
+docker pull stremio/server
+```
+
+<br/>
+
+Start the stremio server:
+
+```
+docker run -d \
+  --name stremio-server \
+  -p 11470:11470 \
+  -v /path/to/stremio/config:/root/.stremio \
+  stremio/stremio-server
+```
+
+<br/>
+
+
+Verify that the stremio-server container is up and running:
+```
+docker ps
+```
+
+
+Thenn check that you can reach it via your webbrowser on port 11470 of that LXC IP:
+
+e.g. 192.168.0.29:114770
+
+<br/>
+ 
+5️⃣ **Harden the system with firewall rules and access control + configure NAT and disable IPv6**
 
   Disable IPv6:
 
@@ -396,15 +448,9 @@ iptables -A OUTPUT -p udp --dport 53 ! -d 10.2.0.1 -j REJECT
 netfilter-persistent save
 ```
 
+6️⃣ **Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)**
 
-7️⃣ **Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)**
-
-8️⃣ **Set the Start/ shutdown order to make sure the VPN LXC boots first, then Stremio second**
-    Uder each LXC in the Proxmox node -> Options -> Start/ Shutdown order -> Edit (VPN-LXC=1, Stremio-LXC=2)
-
-<br/>
-
-## 5.🗒️Systemd Auto-Start Integration
+🗒️Systemd Auto-Start Integration
 
 The following will show the steps I took to make a custom script that automatically runs on every boot. It ensures:
 
@@ -548,7 +594,11 @@ What this ensures against:<br/><br/>
 
 <br/>
 
-## 6. 🧱🛡️Set up a hardened Firewall to:
+
+7️⃣ **Set the Start/ shutdown order to make sure the VPN LXC boots first, then Stremio second**
+    Uder each LXC in the Proxmox node -> Options -> Start/ Shutdown order -> Edit (VPN-LXC=1, Stremio-LXC=2)
+
+8️⃣ 🧱🛡️**Set up a hardened Firewall to:**
 
 
 - General Policy: Drop all inbound traffic by default; allow only explicitly defined connections.
@@ -559,9 +609,9 @@ Apply the above shown Firewall rules on the Host-level under Proxmox->Firewall->
 
 > [!IMPORTANT]
 > Important here is to keep the Block all other connections as the very last rule to avoid locking yourtself out!
+**Test: verify Stremio has only VPN-based internet access**
 
-
-
+<br/>
 
 ## 7. ✅Final test for any DNS / IP Leaks from both containers:
 
