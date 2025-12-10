@@ -92,9 +92,9 @@ Enforced privacy
 Streaming addon geolocation freedom
 
 
-## 4.📋Setup Summary
+## 4.📋Setup Summary 🏗
 
-1️⃣ **Install Proxmox and configure secure defaults**
+### 1️⃣ Install Proxmox and configure secure defaults
 
 - Create a Sudo User<br/>
 
@@ -158,7 +158,7 @@ dpkg-reconfigure --priority=low unattended-upgrades
 - Set up Tailscale and follow the steps to set up a remote connection: https://tailscale.com/kb/1174/install-debian-bookworm
 <br/>
 
-2️⃣ **Create VPN LXC (Debian)**
+### 2️⃣ Create VPN LXC (Debian)
 
 Settings for my VPN LXC:
 
@@ -199,7 +199,7 @@ My Network interfaces for this VPN LXC are:<br/>
 
 <br/>
 
-3️⃣ **Create a Stremio LXC attached to the private VPN bridge and one network to stream locally**
+### 3️⃣ Create a Stremio LXC attached to the private VPN bridge and one network to stream locally
 
   My Network interfaces for this Stremio LXC are:<br/>
 
@@ -213,7 +213,7 @@ My Network interfaces for this VPN LXC are:<br/>
 
 <br/>
 
-4️⃣ **Install Docker and run the Stremio Server: https://github.com/Stremio/server-docker**
+### 4️⃣ Install Docker and run the Stremio Server
 
 <br/>
 
@@ -273,7 +273,7 @@ e.g. 192.168.0.29:114770
 
 <br/>
  
-5️⃣ **Harden the system with firewall rules and access control + configure NAT and disable IPv6**
+### 5️⃣ Harden the system with firewall rules and access control + configure NAT and disable IPv6
 
   Disable IPv6:
 
@@ -323,7 +323,7 @@ sysctl net.ipv6.conf.default.disable_ipv6
 <br/>
 
 > [!NOTE]
-> 🛠 Prerequisites for VPN & Stremio LXC Firewall
+> 🛠 Prerequisites for VPN & Stremio LXC Firewall:<br/>
 > Before applying the firewall and NAT rules, make sure the following packages and services are installed and enabled in both LXC's:
 
 <br/>
@@ -352,17 +352,17 @@ sudo systemctl enable --now nftables
 
 These commands configure the VPN LXC to securely route traffic from other containers through WireGuard:
 
-Forward traffic between the host interface (eth1) and WireGuard (wg0).
+✅Forward traffic between the host interface (eth1) and WireGuard (wg0).
 
-Masquerade (NAT) all container traffic so it exits via the VPN.
+✅Masquerade (NAT) all container traffic so it exits via the VPN.
 
-Block DNS leaks by forcing DNS queries through the WireGuard server.
+✅Block DNS leaks by forcing DNS queries through the WireGuard server.
 
-Persist rules on boot using netfilter-persistent.
+✅Persist rules on boot using netfilter-persistent.
 
-Extra wg-quick nftables chains are automatically created to mark UDP packets and protect the WireGuard IP.
+✅Extra wg-quick nftables chains are automatically created to mark UDP packets and protect the WireGuard IP.
 
-IPv6 is disabled to prevent leaks, so no IPv6 rules are needed.
+✅IPv6 is disabled to prevent leaks, so no IPv6 rules are needed.
 
 <br/>
 📡 Set up NAT and IPv4 forwarding rules
@@ -448,21 +448,23 @@ iptables -A OUTPUT -p udp --dport 53 ! -d 10.2.0.1 -j REJECT
 netfilter-persistent save
 ```
 
-6️⃣ **Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection (see point following point 5.)**
+<br/>
 
-🗒️Systemd Auto-Start Integration
+### 6️⃣ Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection
+
+⚙️**Systemd Auto-Start Integration**⚙️
 
 The following will show the steps I took to make a custom script that automatically runs on every boot. It ensures:
 
-- No DNS leaks
+✅No DNS leaks
 
-- The VPN DNS is only used after the VPN tunnel is up
+✅The VPN DNS is only used after the VPN tunnel is up
 
-- All DNS traffic is blocked unless it goes to the VPN DNS
+✅All DNS traffic is blocked unless it goes to the VPN DNS
 
-- The system temporarily uses a public DNS to bring up the VPN interface
+✅The system temporarily uses a public DNS to bring up the VPN interface
 
-- Fully automatic on boot via systemd
+✅Fully automatic on boot via systemd
 
 This tutorial assumes:
 
@@ -595,10 +597,10 @@ What this ensures against:<br/><br/>
 <br/>
 
 
-7️⃣ **Set the Start/ shutdown order to make sure the VPN LXC boots first, then Stremio second**
-    Uder each LXC in the Proxmox node -> Options -> Start/ Shutdown order -> Edit (VPN-LXC=1, Stremio-LXC=2)
+### 7️⃣ Set the Start/ shutdown order to make sure the VPN LXC boots first, then Stremio second
+    Under each LXC in the Proxmox node -> Options -> Start/ Shutdown order -> Edit (VPN-LXC=1, Stremio-LXC=2)
 
-8️⃣ 🧱🛡️**Set up a hardened Firewall to:**
+### 8️⃣ 🔥🧱Set up a hardened Firewall
 
 
 - General Policy: Drop all inbound traffic by default; allow only explicitly defined connections.
@@ -613,7 +615,7 @@ Apply the above shown Firewall rules on the Host-level under Proxmox->Firewall->
 
 <br/>
 
-## 7. ✅Final test for any DNS / IP Leaks from both containers:
+## 5. ✅Final test for any DNS / IP Leaks from both containers:
 
 ![Testing VPN](contentimages/vpn-lxc-test.png)
 
@@ -624,9 +626,9 @@ Then a quick check using an online IP lookup tool:
 
 It works! All routing goes through my VPN including any DNS queries!
 
-## 8. Final checks / hardening
+## 6. Final checks / hardening
 
-- Harden kernel sysctls
+- 🛡 Harden kernel sysctls
 
   Check current sysctls:
 ```
@@ -637,7 +639,7 @@ sysctl net.ipv4.conf.all.send_redirects
 ```
 <br/>
 
-Harden with;
+If necessary, harden with;
 ```
 cat <<EOF >> /etc/sysctl.conf
 net.ipv4.conf.all.accept_redirects = 0
@@ -650,7 +652,7 @@ sysctl -p
 ```
 <br/>
 
-- Check if Tailscale is active
+- 🔗 Check if Tailscale is active
 ```
 tailscale status
 ```
@@ -663,7 +665,7 @@ Correct 100.x.x.x IP
 
 <br/>
 
-- Check open ports;
+- 🔒 Check open ports;
 ```
 - ss -tuln
 ```
@@ -684,7 +686,7 @@ Maybe VPN LXC bridges
 
 <br/>
 
-- Check SSH security:
+- 🔑 Check SSH security:
   Check SSH config;
 ```
 grep -E "PermitRootLogin|PasswordAuthentication" /etc/ssh/sshd_config
@@ -701,7 +703,7 @@ PasswordAuthentication no
 
 <br/>
 
-  Check if SSH is listening on the LAN only:
+- 🔑🌐 Check if SSH is listening on the LAN only:
 ```
 ss -tulpn | grep ssh
 ```
@@ -736,7 +738,7 @@ systemctl restart sshd
 
 <br/>
 
-- Check if unattended-upgrades is installed
+- 🧩 Check if unattended-upgrades is installed
 ```
 systemctl status unattended-upgrades
 ```
@@ -762,13 +764,13 @@ It should be commented out:
 # deb https://enterprise.proxmox.com ...
 ```
 
-- Check your firewall drop policy:
+- 🔥🧱 Check your firewall drop policy:
 ```
 grep policy /etc/pve/firewall/cluster.fw
 grep policy /etc/pve/nodes/$(hostname)/host.fw
 ```
 
-## 8. Future Expansion
+## 7. Future Expansion
 
 The architecture supports adding more containers, such as:
 
