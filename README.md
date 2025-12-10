@@ -650,7 +650,7 @@ What this ensures against:<br/><br/>
 ### 4.8 Set the Start/ shutdown order
 This makes sure that the VPN LXC boots first, then Stremio second so it can build a connection seamlessly
 
-    Under each LXC in the Proxmox node -> Options -> Start/ Shutdown order -> Edit (VPN-LXC=1, Stremio-LXC=2)
+ Under each LXC in the Proxmox node ➡️ Options ➡️ Start/ Shutdown order ➡️ Edit (VPN-LXC=1, Stremio-LXC=2)
 
 ### 4.9 🔥🧱Set up a hardened Firewall
 
@@ -663,6 +663,7 @@ Apply the above shown Firewall rules on the Host-level under Proxmox->Firewall->
 
 > [!IMPORTANT]
 > Important here is to keep the Block all other connections as the very last rule to avoid locking yourtself out!
+
 **Test: verify Stremio has only VPN-based internet access**
 
 <br/>
