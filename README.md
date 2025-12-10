@@ -1,14 +1,23 @@
 # Hardened Home Server Setup (Proxmox + VPN Streaming + Modular LXC Stack)
 
-## Content:
-1.[Overview](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
-2.[Architecture Diagram (ASCII)](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--architecture-diagram-ascii)<br/>
-3.[How it works](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--how-it-works)<br/>
-3.[Setup Summary](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--setup-summary)<br/>
-3.[Systemd Auto-Start Integration](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--systemd-auto-start-integration)<br/>
-3.[Setting up a hardened Firewall](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--setting-up-a-hardened-firewall)<br/>
-3.[Architecture Diagram (ASCII)](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
-3.[Architecture Diagram (ASCII)](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
+## Content Overview:
+1.[📦Overview](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
+2.[🗺️Architecture Diagram (ASCII)](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--architecture-diagram-ascii)<br/>
+3.[⚙️How it works](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--how-it-works)<br/>
+4.[🏗️Setup Guide](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--setup-guide)<br/>
+  4.1[🧑‍💻🔒Install Proxmox and configure secure defaults](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#41-install-proxmox-and-configure-secure-defaults))<br/>
+  4.2[📡Create a VPN LXC](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#42-create-vpn-lxc))<br/>
+  4.3[🎬Create a Stremio LXC](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#43-create-a-stremio-lxc-attached-to-the-private-vpn-bridge-and-one-network-to-stream-locally))<br/>
+  4.4[🐳⚡Install Docker and run the Stremio Server](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#44-install-docker-and-run-the-stremio-server)<br/>
+  4.5[🚫🌐Disable IPv6](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#45-disable-ipv6)<br/>
+  4.6[🌐Set up NAT and IPv4 forwarding rules](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#set-up-nat-and-ipv4-forwarding-rules)<br/>
+  4.7[⚡⚙️Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#46-create-a-script-to-handle-automatic-setting-up-of-a-wireguard-connection-on-startup--boot-and-then-removing-the-non-vpn-outbound-connection)<br/>
+  4.8[⏱️🔁Set the Start/ shutdown order](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#47-set-the-start-shutdown-order-to-make-sure-the-vpn-lxc-boots-first-then-stremio-second))<br/>
+  4.9[🔥🧱Set up a hardened Firewall](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#48-set-up-a-hardened-firewall)<br/>
+5.[🔍🌐Final test for any DNS / IP Leaks](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#5-final-test-for-any-dns--ip-leaks-from-both-containers)<br/>
+6.[🛡️Final Checks / Hardening](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#6-final-checks--hardening)<br/>
+7.[🚀Future Expansion](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#7-future-expansion)<br/>
+
 
 
 
@@ -32,7 +41,7 @@ The goal of the project was to build a privacy-focused streaming and automation 
 
 This Github Project aims to give others a guide on how to setup such a streaming server and for myself as a repository to copy the code if i want to replicate this server for other relatives with ease without having to rebuild and reconfigure everything from scratch.
 
-## 2. 🖼️Architecture Diagram (ASCII)
+## 2.  🗺️Architecture Diagram (ASCII)
 ```
                 ┌─────────────────────────┐
                 │     Proxmox Host        │   <--- VPN Connection via Tailscale
@@ -92,7 +101,7 @@ Enforced privacy
 Streaming addon geolocation freedom
 
 
-## 4.📋Setup Summary 🏗
+## 4.📋Setup Guide 🏗
 
 ### 4.1 Install Proxmox and configure secure defaults
 
@@ -183,21 +192,20 @@ dpkg-reconfigure --priority=low unattended-upgrades
   https://tailscale.com/kb/1174/install-debian-bookworm
 <br/>
 
-### 4.2 Create VPN LXC (Debian)
+### 4.2 Create VPN LXC
 
 Settings for my VPN LXC:
 
-
-
-| Setting       | Value         |
+| Setting ⚙️      | Value 💻        |
 | ------------- | ------------- |
 | Cores         | 1             |
 | RAM           | 1 GB          |
-| Storage       | 20 GB         |
+| Storage       | 40 GB         |
 | OS Type       | Debian 64     |
 | Unprivileged  | NO            |
 | Privileged    | YES           |
 | Start at boot | YES           |
+| Nameserver    | 1.1.1.1       |
 
 > [!NOTE]
 > Make sure the VPN LXC is Privileged, otheriwse there will be routing issues<br/>
@@ -228,6 +236,20 @@ My Network interfaces for this VPN LXC are:<br/>
 
 ### 4.3 Create a Stremio LXC attached to the private VPN bridge and one network to stream locally
 
+Settings for my Stremio LXC:
+
+| Setting ⚙️      | Value 💻        |
+| ------------- | ------------- |
+| Cores         | 2             |
+| RAM           | 3.5 GB        |
+| Storage       | 50 GB         |
+| OS Type       | Debian 64     |
+| Unprivileged  | YES           |
+| Privileged    | NO            |
+| Start at boot | YES           |
+| Nesting       | YES           |
+| Nameserver    | 10.2.0.1      |
+
   My Network interfaces for this Stremio LXC are:<br/>
 
 ![Eth0_Network-Stremio](contentimages/eth0stremio.png)
@@ -245,7 +267,7 @@ My Network interfaces for this VPN LXC are:<br/>
 <br/>
 
 
-Install docker:
+Install docker 🐳
 
 ```
 sudo apt install -y docker.io
@@ -275,7 +297,7 @@ docker pull stremio/server
 
 <br/>
 
-Start the stremio server:
+🚀 Start Stremio server:
 
 ```
 docker run -d \
@@ -300,7 +322,7 @@ e.g. 192.168.0.29:114770
 
 <br/>
  
-### 4.5 Harden the system with firewall rules and access control + configure NAT and disable IPv6
+### 4.5 Disable IPv6
 
   Disable IPv6:
 
@@ -345,7 +367,7 @@ sysctl net.ipv6.conf.default.disable_ipv6
 - Should return '1'
 
 
-### Set up NAT and IPv4 forwarding rules:
+### 4.6 Set up NAT and IPv4 forwarding rules:
 
 <br/>
 
@@ -375,7 +397,7 @@ sudo systemctl enable --now nftables
 
 <br/>
 
-📡 VPN LXC Firewall & NAT Rules
+🌐🔐 VPN LXC Firewall & NAT Rules
 
 These commands configure the VPN LXC to securely route traffic from other containers through WireGuard:
 
@@ -392,7 +414,7 @@ These commands configure the VPN LXC to securely route traffic from other contai
 ✅IPv6 is disabled to prevent leaks, so no IPv6 rules are needed.
 
 <br/>
-📡 Set up NAT and IPv4 forwarding rules
+📡 Set up NAT and IPv4 forwarding rules on the VPN LXC
 <br/>
 
 Allow forwarding between the LXC's network interface (replace eth1 with your actual interface name) and the WireGuard interface:
@@ -477,7 +499,7 @@ netfilter-persistent save
 
 <br/>
 
-### 4.6 Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection
+### 4.7 Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection
 
 ⚙️**Systemd Auto-Start Integration**⚙️
 
@@ -624,10 +646,12 @@ What this ensures against:<br/><br/>
 <br/>
 
 
-### 4.7 Set the Start/ shutdown order to make sure the VPN LXC boots first, then Stremio second
+### 4.8 Set the Start/ shutdown order
+This makes sure that the VPN LXC boots first, then Stremio second so it can build a connection seamlessly
+
     Under each LXC in the Proxmox node -> Options -> Start/ Shutdown order -> Edit (VPN-LXC=1, Stremio-LXC=2)
 
-### 4.8 🔥🧱Set up a hardened Firewall
+### 4.9 🔥🧱Set up a hardened Firewall
 
 
 - General Policy: Drop all inbound traffic by default; allow only explicitly defined connections.
@@ -642,7 +666,7 @@ Apply the above shown Firewall rules on the Host-level under Proxmox->Firewall->
 
 <br/>
 
-## 5. ✅Final test for any DNS / IP Leaks from both containers:
+## 5. ✅Final test for any DNS / IP Leaks from both containers
 
 ![Testing VPN](contentimages/vpn-lxc-test.png)
 
@@ -653,7 +677,7 @@ Then a quick check using an online IP lookup tool:
 
 It works! All routing goes through my VPN including any DNS queries!
 
-## 6. Final checks / hardening
+## 6. Final checks / Hardening
 
 - 🛡 Harden kernel sysctls
 
