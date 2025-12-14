@@ -38,6 +38,14 @@ Network routing is handled using policy-based routing, iptables, and Proxmox con
 This setup benefits from a future-proof architecture that allows adding LXC containers for Home Assistant, Frigate, and other home-automation services to the extent to which the underlying hardware can support it.
 
 
+⚠️ Disclaimer
+
+This project is for educational and personal use only.
+The author does not condone or encourage copyright infringement or violation of service terms.
+Users are responsible for complying with local laws and service agreements.
+
+
+
 
 ## 2. 🗺️Architecture Diagram (ASCII)
 ```
@@ -194,7 +202,7 @@ dpkg-reconfigure --priority=low unattended-upgrades
 
 ### 4.2 Create VPN LXC
 
-Settings for my VPN LXC:
+### Settings for my VPN LXC:
 
 | Setting ⚙️      | Value 💻        |
 | ------------- | ------------- |
@@ -208,11 +216,34 @@ Settings for my VPN LXC:
 | Nameserver    | 1.1.1.1       |
 
 > [!NOTE]
-> Make sure the VPN LXC is Privileged, otheriwse there will be routing issues
+> The VPN LXC must be privileged in this setup due to the way WireGuard, policy routing, and firewall rules interact inside containers.
+
+### Reasons:
+- WireGuard requires low-level networking access
+- WireGuard creates kernel interfaces (wg0) and manipulates routing tables. Unprivileged containers lack the required CAP_NET_ADMIN capabilities to reliably create and manage these interfaces.
+- Policy-based routing and NAT are enforced inside the container
+- This setup applies iptables NAT and forwarding rules directly inside the VPN LXC to act as a gateway for downstream containers. These operations are restricted or unreliable in unprivileged LXCs.
+- Stable routing under boot and restart conditions
+- Using a privileged container avoids edge cases where routing, firewall rules, or tunnel interfaces silently fail after reboots or Proxmox updates.
+
+### Security tradeoff:
+
+- Privileged containers have broader access to the host kernel and therefore carry higher risk if compromised.
+
+### To minimize exposure:
+
+- Only the VPN LXC is privileged
+- The Stremio LXC remains unprivileged
+- The VPN LXC exposes no public services
+- Firewall rules restrict all inbound traffic by default
+- This design isolates risk to a single, hardened gateway container while maintaining reliable VPN enforcement.
 
 <br/>
 
-Install Wireguard and edit the config file (e.g ProtonVPN)
+### Set up the LXC:
+
+
+
 
 Create internal bridge (vmbr99) for isolated routing between both LXCs and one for it so be reached on the network.
 
@@ -231,6 +262,64 @@ My Network interfaces for this VPN LXC are:<br/>
 <br/>
 
   ![Eth1_Network-VPN](contentimages/eth1vpn.png)
+
+
+Install Wireguard and edit the config file (e.g ProtonVPN)
+
+Install wireguard with:
+
+```
+sudo apt install -y wireguard wireguard-tools resolvconf
+```
+This installs:
+
+- wg → WireGuard control utility
+- wg-quick → brings interfaces up/down from config files
+- resolvconf → DNS handling (later locked down manually)
+
+Edit the Wireguard config file and paste in your private key from your VPN provider:
+
+```
+sudo nano /etc/wireguard/wg0.conf
+```
+
+My wireguard config file (redacted private key for obvious reasons):
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+Key points:
+
+- AllowedIPs = 0.0.0.0/0 forces all traffic through the VPN
+- DNS is set to the VPN DNS (10.2.0.1)
+- PersistentKeepalive keeps NAT mappings alive
+
+Enable IP Forwarding (Required for Gateway LXC):
+
+```
+sudo nano /etc/sysctl.conf
+```
+
+Add:
+```
+net.ipv4.ip_forward=1
+```
+
+Apply immediately:
+```
+sudo sysctl -p
+```
+
+Start the VPN Tunnel with:
+```
+sudo wg-quick up wg0
+```
+
+Verify:
+```
+wg show
+ip a show wg0
+```
+
 
 
 <br/>
@@ -263,7 +352,7 @@ Settings for my Stremio LXC:
 
 <br/>
 
-### 4.4 Install Docker and run the Stremio Server
+### 4.4 🐳Install Docker and run the Stremio Server⚡
 
 <br/>
 
@@ -274,13 +363,13 @@ Install docker 🐳
 sudo apt install -y docker.io
 ```
 
-<br/>
+
 
 Enable and start the Docker service so it runs on boot:
 ```
 sudo systemctl enable --now docker
 ```
-<br/>
+
 
 
 Check that Docker is active:
@@ -288,7 +377,7 @@ Check that Docker is active:
 sudo systemctl status docker
 ```
 
-<br/>
+
 
 Then; pull the docker image:
 
@@ -296,7 +385,7 @@ Then; pull the docker image:
 docker pull stremio/server
 ```
 
-<br/>
+
 
 🚀 Start Stremio server:
 
@@ -308,7 +397,7 @@ docker run -d \
   stremio/stremio-server
 ```
 
-<br/>
+
 
 
 Verify that the stremio-server container is up and running:
@@ -319,41 +408,41 @@ docker ps
 
 Thenn check that you can reach it via your webbrowser on port 11470 of that LXC IP:
 
-e.g. 192.168.0.29:114770
+e.g. 192.168.0.29:11470
 
-<br/>
- 
+
+
 ### 4.5 🛑 Disable IPv6 
 
   Disable IPv6:
 
   In both the VPN LXC and Stremio LXC, edit the /etc/sysctl.conf file:
 
-<br/>
+
 
 ```
 sudo nano /etc/sysctl.conf
 ```
 
-<br/>
+
 
 Add these lines:
 ```
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 ```
-<br/>
+
 
 - Any entries in the /etc/sysctl.conf file are applied automatically on boot.
 
-<br/>
+
 
 - Reload the sysctl settings:
 ```
 sudo sysctl -p
 ```
 
-<br/>
+
 
 Confirm with:
 
@@ -363,20 +452,20 @@ sysctl net.ipv6.conf.all.disable_ipv6
 sysctl net.ipv6.conf.default.disable_ipv6
 ```
 
-<br/>
+
 
 - Should return '1'
 
 
 ### 4.6 Set up NAT and IPv4 forwarding rules:
 
-<br/>
+
 
 > [!NOTE]
 > 🛠 Prerequisites for VPN & Stremio LXC Firewall:<br/>
 > Before applying the firewall and NAT rules, make sure the following packages and services are installed and enabled in both LXC's:
 
-<br/>
+
 
 ```
 # Update package lists
@@ -392,26 +481,36 @@ sudo systemctl enable --now netfilter-persistent
 sudo systemctl enable --now nftables
 ```
 
-<br/>
+> [!NOTE]
+> nft / iptable clarification:
+> nftables (nft) is the modern, unified replacement for the legacy iptables framework, offering a simpler syntax, better performance, and a consolidated approach to firewall management in Linux.
+> nftables
+
+- wg-quick automatically creates nftables chains to mark and protect WireGuard traffic
+
+- Custom NAT, forwarding, and DNS-blocking rules are defined using iptables for:
+
+- Simplicity
+
+- Familiar syntax
+
+- Compatibility with netfilter-persistent
+
+
 
 **VPN-LXC:**
 
-<br/>
+
 
 🌐 VPN LXC Firewall & NAT Rules 🔐
 
 These commands configure the VPN LXC to securely route traffic from other containers through WireGuard:
 
 ✅Forward traffic between the host interface (eth1) and WireGuard (wg0).
-
 ✅Masquerade (NAT) all container traffic so it exits via the VPN.
-
 ✅Block DNS leaks by forcing DNS queries through the WireGuard server.
-
 ✅Persist rules on boot using netfilter-persistent.
-
 ✅Extra wg-quick nftables chains are automatically created to mark UDP packets and protect the WireGuard IP.
-
 ✅IPv6 is disabled to prevent leaks, so no IPv6 rules are needed.
 
 <br/>
@@ -424,7 +523,7 @@ iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
 iptables -A FORWARD -i wg0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
 ```
 
-<br/>
+
 
 Enable IPv4 masquerading so all container traffic goes out through the VPN:
 ```
@@ -440,35 +539,31 @@ iptables -A OUTPUT -p tcp --dport 53 ! -d 10.2.0.1 -j REJECT
 iptables -A OUTPUT -p udp --dport 53 ! -d 10.2.0.1 -j REJECT
 ```
 
-<br/>
+
 > [!NOTE]
 > No IPv6 rules are needed and can be skipped, because we disabled IPv6 completely already to avoid any leaks.
 
-<br/>
+
 
 💾 Make the rules persistent on boot
 
 ```
 netfilter-persistent save
 ```
-<br/>
+
 
 **Stremio-LXC:**
 
 📡 VPN and DNS Rules for Stremio LXC
-<br/>
+
 
 These commands configure the Stremio LXC to route all traffic through the WireGuard VPN and prevent DNS leaks:
 
-Forward traffic between the LXC’s network interface and the WireGuard interface.
-
-Masquerade (NAT) all container traffic so it exits via the VPN.
-
-Force DNS through the WireGuard server by rejecting any other DNS requests.
-
-Make rules persistent so they survive reboots.
-
-No IPv6 rules are needed since IPv6 is disabled to avoid leaks.
+✅ Forward traffic between the LXC’s network interface and the WireGuard interface.
+✅ Masquerade (NAT) all container traffic so it exits via the VPN.
+✅ Force DNS through the WireGuard server by rejecting any other DNS requests.
+✅ Make rules persistent so they survive reboots.
+✅ No IPv6 rules are needed since IPv6 is disabled to avoid leaks.
 
 <br/>
 Allow forwarding between Stremio LXC network and WireGuard
@@ -490,7 +585,7 @@ iptables -t nat -A POSTROUTING -s 192.168.99.0/24 -o wg0 -j MASQUERADE
 iptables -A OUTPUT -p tcp --dport 53 ! -d 10.2.0.1 -j REJECT
 iptables -A OUTPUT -p udp --dport 53 ! -d 10.2.0.1 -j REJECT
 ```
-<br/>
+
 
 💾 Make the rules persistent on boot
 
@@ -498,7 +593,7 @@ iptables -A OUTPUT -p udp --dport 53 ! -d 10.2.0.1 -j REJECT
 netfilter-persistent save
 ```
 
-<br/>
+
 
 ### 4.7 Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection
 
@@ -507,13 +602,9 @@ netfilter-persistent save
 The following will show the steps I took to make a custom script that automatically runs on every boot. It ensures:
 
 ✅No DNS leaks
-
 ✅The VPN DNS is only used after the VPN tunnel is up
-
 ✅All DNS traffic is blocked unless it goes to the VPN DNS
-
 ✅The system temporarily uses a public DNS to bring up the VPN interface
-
 ✅Fully automatic on boot via systemd
 
 This tutorial assumes:
@@ -524,20 +615,20 @@ This tutorial assumes:
 
 - Temporary DNS for bootstrapping: 1.1.1.1 (cloudflare)
 
-<br/>
 
-(1). Create the VPN bootstrap script
+
+Create the VPN bootstrap script.
 Inside the VPN LXC, create:
 
-<br/>
+
 
 ```
 sudo nano /usr/local/bin/vpn-dns-lock.sh
 ```
 
-<br/>
 
-(2). Enter the following script:
+
+Enter the following script:
 <br/>
 
 ```
@@ -581,27 +672,27 @@ iptables -I OUTPUT ! -d $VPN_DNS -p tcp --dport 53 -j REJECT
 echo "[INFO] DNS leak protection applied."
 ```
 
-<br/>
+
 
 Then, make it executable:
 
-<br/>
+
 
 ```
 sudo chmod +x /usr/local/bin/vpn-dns-lock.sh
 ```
-<br/>
+
 
 (3). Prevent Systemd-Resolved from overwriting DNS:
 
-<br/>
+
 
 Enter:
 ```
 chattr +i /etc/resolv.conf
 ```
 
-<br/>
+
 
 (4). Create a Systemd Service:
 Enter:
@@ -609,7 +700,7 @@ Enter:
 sudo nano /etc/systemd/system/vpn-dns-lock.service
 ```
 
-<br/>
+
 
 Then paste in:
 
@@ -629,7 +720,7 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 ```
 
-<br/>
+
 
 Enable and start (automatically start on every boot):
 ```
@@ -644,13 +735,15 @@ What this ensures against:<br/><br/>
 ✔ Fallback DNS hijacking<br/>
 ✔ Fail-open scenarios when VPN temporarily drops<br/>
 
-<br/>
+
 
 
 ### 4.8 ⏱️Set the Start/ shutdown order🔁
 This makes sure that the VPN LXC boots first, then Stremio second so it can build a connection seamlessly
 
  Under each LXC in the Proxmox node ➡️ Options ➡️ Start/ Shutdown order ➡️ Edit (VPN-LXC=1, Stremio-LXC=2)
+
+ 
 
 ### 4.9 🔥Set up a hardened Firewall 🧱
 
@@ -666,7 +759,8 @@ Apply the above shown Firewall rules on the Host-level under Proxmox->Firewall->
 
 **Test: verify Stremio has only VPN-based internet access**
 
-<br/>
+
+
 
 ## 4.10 🖥️ Set up a Maintenance LXC (CachyOS) ⚙️
 
@@ -681,6 +775,8 @@ This is optional, but I would highly recommend setting this up if you plan on se
 - Follow the steps depending on your OS and it should spin up a practical maintenance you can now use if you need it.
 To save hardware resources, this LXC should be only started while needed and used.
 
+
+
 ## 5. 🏁Final test for any DNS / IP Leaks from both containers ✅
 
 ![Testing VPN](contentimages/vpn-lxc-test.png)
@@ -691,6 +787,8 @@ Then a quick check using an online IP lookup tool:
 
 
 It works! All routing goes through my VPN including any DNS queries!
+
+
 
 ## 6. 👮 Final checks / Hardening 🛡️
 
