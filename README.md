@@ -10,13 +10,13 @@
   4.3[🎬Create a Stremio LXC](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#43-create-a-stremio-lxc-attached-to-the-private-vpn-bridge-and-one-network-to-stream-locally))<br/>
   4.4[🐳Install Docker and run the Stremio Server⚡](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#44-install-docker-and-run-the-stremio-server)<br/>
   4.5[🚫Disable IPv6](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#45-disable-ipv6)<br/>
-  4.6[🌐Set up NAT and IPv4 forwarding rules](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#set-up-nat-and-ipv4-forwarding-rules)<br/>
+  4.6[🌐Set up NAT and IPv4 forwarding rules](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#46-set-up-nat-and-ipv4-forwarding-rules)<br/>
   4.7[⚙️Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection⚡](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#47-create-a-script-to-handle-automatic-setting-up-of-a-wireguard-connection-on-startup--boot-and-then-removing-the-non-vpn-outbound-connection)<br/>
-  4.8[⏱️Set the Start/ shutdown order🔁](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#48-set-the-start-shutdown-order-to-make-sure-the-vpn-lxc-boots-first-then-stremio-second))<br/>
-  4.9[🔥Set up a hardened Firewall 🧱](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#49-set-up-a-hardened-firewall)<br/>
-  5.0[🖥️ Set up a Maintenance LXC (CachyOS) ⚙️](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#50-set-up-a-maintenance-lxc-cachyos)<br/>
-5.[🏁Final test for any DNS / IP Leaks from both containers ✅](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#5-final-test-for-any-dns--ip-leaks-from-both-containers)<br/>
-6.[👮 Final checks / Hardening 🛡️](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#6-final-checks--hardening)<br/>
+  4.8[⏱️Set the Start/ shutdown order🔁](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#48-%EF%B8%8Fset-the-start-shutdown-order)<br/>
+  4.9[🔥Set up a hardened Firewall 🧱](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#49-set-up-a-hardened-firewall-)<br/>
+  4.10[🖥️ Set up a Maintenance LXC (CachyOS) ⚙️](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#410-%EF%B8%8F-set-up-a-maintenance-lxc-cachyos-%EF%B8%8F)<br/>
+5.[🏁Final test for any DNS / IP Leaks from both containers ✅](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#5-final-test-for-any-dns--ip-leaks-from-both-containers-)<br/>
+6.[👮 Final checks / Hardening 🛡️](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#6--final-checks--hardening-%EF%B8%8F)<br/>
 7.[🚀Future Expansion](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#7-future-expansion)<br/>
 
 
@@ -68,6 +68,7 @@ This setup benefits from a future-proof architecture that allows adding LXC cont
                                    │    on Smart TV/ IPad / etc     │
                                    └────────────────────────────────┘
 ```
+<br/>
 
 ## 3. ⚙️How It Works
 -  Proxmox as the Core
@@ -97,6 +98,7 @@ Benefits:
 ✅ Enforced privacy
 
 ✅ Streaming addon geolocation freedom
+<br/>
 
 
 ## 4. 📋Setup Guide🏗
@@ -834,7 +836,7 @@ grep policy /etc/pve/firewall/cluster.fw
 grep policy /etc/pve/nodes/$(hostname)/host.fw
 ```
 
-## 7. Future Expansion
+## 7. 🚀 Future Expansion
 
 The architecture supports adding more containers, such as:
 
