@@ -1,23 +1,23 @@
-# Hardened Home Server Setup (Proxmox + VPN Streaming + Modular LXC Stack)
+# proxmox-vpn-stream (Proxmox + VPN Streaming + Modular LXC Stack)
 
 ## Content Overview:
-1.[📦Overview](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--overview)<br/>
-2.[🗺️Architecture Diagram (ASCII)](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--architecture-diagram-ascii)<br/>
-3.[⚙️How it works](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--how-it-works)<br/>
-4.[🏗️Setup Guide](https://github.com/cyber-duckie/hardend-home-server/blob/main/README.md#1--setup-guide)<br/>
-  4.1[🧑‍💻Install Proxmox and configure secure defaults🔒](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#41-install-proxmox-and-configure-secure-defaults))<br/>
-  4.2[📡Create a VPN LXC](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#42-create-vpn-lxc))<br/>
-  4.3[🎬Create a Stremio LXC](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#43-create-a-stremio-lxc-attached-to-the-private-vpn-bridge-and-one-network-to-stream-locally))<br/>
-  4.4[🐳Install Docker and run the Stremio Server⚡](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#44-install-docker-and-run-the-stremio-server)<br/>
+1.[📦Overview](#overview)<br/>
+2.[🗺️Architecture Diagram (ASCII)](#architecture-diagram)<br/>
+3.[⚙️How it works](#how-it-works)<br/>
+4.[🏗️Setup Guide](#setup-guide)<br/>
+  4.1[🧑‍💻Install Proxmox and configure secure defaults🔒](#install-proxmox-and-configure-secure-defaults)<br/>
+  4.2[📡Create a VPN LXC](#create-vpn-lxc)<br/>
+  4.3[🎬Create a Stremio LXC](#reate-a-stremio-lxc-attached-to-the-private-vpn-bridge-and-one-network-to-stream-locally)<br/>
+  4.4[🐳Install Docker and run the Stremio Server⚡](#install-docker-and-run-the-stremio-server)<br/>
   4.5[🚫Disable IPv6](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#45-disable-ipv6)<br/>
   4.6[🌐Set up NAT and IPv4 forwarding rules](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#46-set-up-nat-and-ipv4-forwarding-rules)<br/>
-  4.7[⚙️Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection⚡](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#47-create-a-script-to-handle-automatic-setting-up-of-a-wireguard-connection-on-startup--boot-and-then-removing-the-non-vpn-outbound-connection)<br/>
-  4.8[⏱️Set the Start/ shutdown order🔁](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#48-%EF%B8%8Fset-the-start-shutdown-order)<br/>
-  4.9[🔥Set up a hardened Firewall 🧱](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#49-set-up-a-hardened-firewall-)<br/>
-  4.10[🖥️ Set up a Maintenance LXC (CachyOS) ⚙️](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#410-%EF%B8%8F-set-up-a-maintenance-lxc-cachyos-%EF%B8%8F)<br/>
-5.[🏁Final test for any DNS / IP Leaks from both containers ✅](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#5-final-test-for-any-dns--ip-leaks-from-both-containers-)<br/>
-6.[👮 Final checks / Hardening 🛡️](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#6--final-checks--hardening-%EF%B8%8F)<br/>
-7.[🚀Future Expansion](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#7-future-expansion)<br/>
+  4.7[⚙️Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection⚡](#create-a-script-to-handle-automatic-setting-up-of-a-wireguard-connection-on-startup--boot-and-then-removing-the-non-vpn-outbound-connection)<br/>
+  4.8[⏱️Set the Start/ shutdown order🔁](#set-the-start-shutdown-order)<br/>
+  4.9[🔥Set up a hardened Firewall 🧱](#set-up-a-hardened-firewall-)<br/>
+  4.10[🖥️ Set up a Maintenance LXC (CachyOS) ⚙️](#set-up-a-maintenance-lxc-cachyos)<br/>
+5.[🏁Final test for any DNS / IP Leaks from both containers ✅](#final-test-for-any-dns--ip-leaks-from-both-containers-)<br/>
+6.[👮 Final checks / Hardening 🛡️](#final-checks--hardening-%EF%B8%8F)<br/>
+7.[🚀Future Expansion](#future-expansion)<br/>
 
 
 
@@ -36,6 +36,11 @@ In it's current configuration, it runs:
 Network routing is handled using policy-based routing, iptables, and Proxmox container configuration.
 
 This setup benefits from a future-proof architecture that allows adding LXC containers for Home Assistant, Frigate, and other home-automation services to the extent to which the underlying hardware can support it.
+
+> [!NOTE]
+> This guide assumes basic familiarity with Proxmox, Linux networking, and WireGuard.
+> Commands are provided verbatim for reproducibility, not as an introduction to these tools.
+
 
 
 ⚠️ Disclaimer
@@ -90,11 +95,9 @@ It exposes a private internal interface to the Stremio LXC via a separate bridge
 
 Responsibilities:
 
-✔️ Handles all outbound internet traffic for the Stremio LXC<br/>
-
-✔️ Provides region-unlocked streaming access<br/>
-
-✔️ Acts as the secure gateway for stremio<br/>
+- Handles all outbound internet traffic for the Stremio LXC
+- Provides region-unlocked streaming access<br/>
+- Acts as the secure gateway for stremio<br/>
 
 ### 📺🎬 Stremio LXC
 
@@ -104,9 +107,8 @@ It has no direct internet route — its only network path goes through the VPN L
 Benefits:
 
 ✅ Enforced privacy
-
 ✅ Streaming addon geolocation freedom
-<br/>
+
 
 
 ## 4. 📋Setup Guide🏗
@@ -139,20 +141,21 @@ sudo whoami
 ```
 
 
-<br/>
+
 
 - ❌ Disable enterprise repos:
 
 Datacenter -> Proxmox -> Repositories -> (under the 'Components' section) Diasable all Repositories with 'enterprise' or 'pve-enterprise'
 
-<br/>
+
+
 - Update and install repositories:
 
  ```
   sudo apt update
   sudo apt full-upgrade -y
  ```
-<br/>
+
 
 Optional: Clean unused old repos:
 
@@ -161,7 +164,7 @@ sudo apt autoremove -y
 sudo apt clean
 ```
 
-<br/>
+
 
 - 🔒 Install Fail2Ban: (https://github.com/fail2ban/fail2ban)<br/>
 
@@ -170,7 +173,7 @@ sudo apt clean
 ```
 sudo apt install -y fail2ban
 ```
-<br/>
+
 
 🔄 Enable and start the service:
 ```
@@ -178,14 +181,14 @@ sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 ```
 
-<br/>
+
 
 Check with:
 ```
 sudo systemctl status fail2ban
 ```
 
-<br/>
+
 
 - 🔄 Set up automatic updating:<br/>
 
@@ -194,11 +197,12 @@ apt install unattended-upgrades
 dpkg-reconfigure --priority=low unattended-upgrades
 ```
 
-<br/>
+
 
 - 🔗 Set up Tailscale and follow the steps to set up a remote connection:
   https://tailscale.com/kb/1174/install-debian-bookworm
-<br/>
+
+
 
 ### 4.2 Create VPN LXC
 
@@ -215,8 +219,10 @@ dpkg-reconfigure --priority=low unattended-upgrades
 | Start at boot | YES           |
 | Nameserver    | 1.1.1.1       |
 
+
 > [!NOTE]
 > The VPN LXC must be privileged in this setup due to the way WireGuard, policy routing, and firewall rules interact inside containers.
+
 
 ### Reasons:
 - WireGuard requires low-level networking access
@@ -285,13 +291,34 @@ sudo nano /etc/wireguard/wg0.conf
 
 My wireguard config file (redacted private key for obvious reasons):
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
+[Interface]
+# Example Wireguard config file for my VPN LXC with redacted info
+# Bouncing = 17
+# NetShield = 2
+# Moderate NAT = off
+# NAT-PMP (Port Forwarding) = off
+# VPN Accelerator = on
+PrivateKey = XXXXXXXXXXX
+Address = 10.XX.XX/XX
+DNS = 10.2.0.1
+PostUp = sysctl -w net.ipv6.conf.all.disable_ipv6=1
+PostDown = sysctl -w net.ipv6.conf.all.disable_ipv6=1
+
+[Peer]
+# COUNTRY#NUMBER
+PublicKey = XXXXXXXXXXX
+AllowedIPs = 0.0.0.0/0
+Endpoint = XX.XX.XX.XX:XXXXX
+```
 
 Key points:
 
-- AllowedIPs = 0.0.0.0/0 forces all traffic through the VPN
-- DNS is set to the VPN DNS (10.2.0.1)
-- PersistentKeepalive keeps NAT mappings alive
+- AllowedIPs = 0.0.0.0/0 Routes all IPv4 traffic through the VPN (full tunnel).
+- DNS is set to the VPN DNS (10.2.0.1) to prevent DNS leaks.
+- PostUp – Disables IPv6 when the VPN interface comes up to avoid IPv6 leaks.
+- PostDown – Keeps IPv6 disabled even if the VPN interface goes down.
+
 
 Enable IP Forwarding (Required for Gateway LXC):
 
@@ -345,16 +372,16 @@ Settings for my Stremio LXC:
 ![Eth0_Network-Stremio](contentimages/eth0stremio.png)
   
 
-  <br/>
+
 
 ![Eth1_Network-Stremio](contentimages/eth1stremio.png)
 
 
-<br/>
+
 
 ### 4.4 🐳Install Docker and run the Stremio Server⚡
 
-<br/>
+
 
 
 Install docker 🐳
@@ -482,19 +509,16 @@ sudo systemctl enable --now nftables
 ```
 
 > [!NOTE]
-> nft / iptable clarification:
-> nftables (nft) is the modern, unified replacement for the legacy iptables framework, offering a simpler syntax, better performance, and a consolidated approach to firewall management in Linux.
-> nftables
-
-- wg-quick automatically creates nftables chains to mark and protect WireGuard traffic
-
-- Custom NAT, forwarding, and DNS-blocking rules are defined using iptables for:
-
-- Simplicity
-
-- Familiar syntax
-
-- Compatibility with netfilter-persistent
+> **iptables vs nftables**
+>
+> Debian and Proxmox use nftables internally. The `iptables` commands shown here are
+> translated to nftables via the compatibility layer.
+>
+> - `wg-quick` automatically creates nftables chains for WireGuard traffic
+> - Custom NAT and DNS rules are defined using iptables for clarity and compatibility
+> - Rules are persisted using `netfilter-persistent`
+>
+> This approach avoids conflicts while remaining compatible with WireGuard.
 
 
 
@@ -672,7 +696,17 @@ iptables -I OUTPUT ! -d $VPN_DNS -p tcp --dport 53 -j REJECT
 echo "[INFO] DNS leak protection applied."
 ```
 
-
+> [!WARNING]
+> Locking `/etc/resolv.conf` is a fail-closed design.
+>
+> If the VPN tunnel does not come up, DNS resolution will fail completely.
+>
+> **Recovery:**
+> ```
+> chattr -i /etc/resolv.conf
+> echo "nameserver 1.1.1.1" > /etc/resolv.conf
+> ```
+> Restore the VPN before re-locking the file.
 
 Then, make it executable:
 
