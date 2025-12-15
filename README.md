@@ -15,14 +15,14 @@
   4.8[⏱️Set the Start/ shutdown order🔁](#set-the-start-shutdown-order)<br/>
   4.9[🔥Set up a hardened Firewall 🧱](#set-up-a-hardened-firewall-)<br/>
   4.10[🖥️ Set up a Maintenance LXC (CachyOS) ⚙️](#set-up-a-maintenance-lxc-cachyos)<br/>
-5.[🏁Final test for any DNS / IP Leaks from both containers ✅](#final-test-for-any-dns--ip-leaks-from-both-containers-)<br/>
-6.[👮 Final checks / Hardening 🛡️](#final-checks--hardening-%EF%B8%8F)<br/>
+5.[🏁Final test for any DNS / IP Leaks from both containers ✅](#final-test-for-any-dns--ip-leaks-from-both-containers)<br/>
+6.[👮 Final checks / Hardening 🛡️](#final-checks--hardening)<br/>
 7.[🚀Future Expansion](#future-expansion)<br/>
 
 
 
 
-## 1. 📦Overview
+## 1. Overview
 
 This project documents a hardened, media streaming server that uses Stremio which I built as a gift for a relative.
 The system is designed for security, modularity, and expandability, using Proxmox VE as the hypervisor. This guide will showcase how I went about setting up this server step by step. It is meant to be setup and configured in a way that it can be basically forgotten about and require no manual maintenance or updating, as this will all be set up to be done automatically.
@@ -52,7 +52,7 @@ Users are responsible for complying with local laws and service agreements.
 
 
 
-## 2. 🗺️Architecture Diagram (ASCII)
+## 2. Architecture Diagram (ASCII)
 ```
                 ┌─────────────────────────┐
                 │     Proxmox Host        │   <--- VPN Connection via Tailscale
@@ -83,7 +83,7 @@ Users are responsible for complying with local laws and service agreements.
 ```
 <br/>
 
-## 3. ⚙️How It Works
+## 3. How It Works
 -  Proxmox as the Core
 
 The Proxmox host manages all LXCs and provides hardware virtualization, backups, and isolation features.
@@ -111,9 +111,9 @@ Benefits:
 
 
 
-## 4. 📋Setup Guide🏗
+## 4. Setup Guide
 
-### 4.1 🧑‍💻Install Proxmox and configure secure defaults🔒
+### 4.1 Install Proxmox and configure secure defaults
 
 - 🧑‍💻 Create a Sudo User<br/>
 
@@ -379,7 +379,7 @@ Settings for my Stremio LXC:
 
 
 
-### 4.4 🐳Install Docker and run the Stremio Server⚡
+### 4.4 Install Docker and run the Stremio Server
 
 
 
@@ -439,7 +439,7 @@ e.g. 192.168.0.29:11470
 
 
 
-### 4.5 🛑 Disable IPv6 
+### 4.5 Disable IPv6 
 
   Disable IPv6:
 
@@ -776,14 +776,14 @@ What this ensures against:<br/><br/>
 
 
 
-### 4.8 ⏱️Set the Start/ shutdown order🔁
+### 4.8 Set the Start/ shutdown order
 This makes sure that the VPN LXC boots first, then Stremio second so it can build a connection seamlessly
 
  Under each LXC in the Proxmox node ➡️ Options ➡️ Start/ Shutdown order ➡️ Edit (VPN-LXC=1, Stremio-LXC=2)
 
  
 
-### 4.9 🔥Set up a hardened Firewall 🧱
+### 4.9 Set up a hardened Firewall
 
 
 - General Policy: Drop all inbound traffic by default; allow only explicitly defined connections.
@@ -800,7 +800,7 @@ Apply the above shown Firewall rules on the Host-level under Proxmox->Firewall->
 
 
 
-## 4.10 🖥️ Set up a Maintenance VM (CachyOS) ⚙️
+## 4.10 Set up a Maintenance VM (CachyOS)
 
 This is optional, but I would highly recommend setting this up if you plan on setting this server up on a remote site and won't be having direct access to it. This 'maintenance VM' will be highly beneficial for handling IP reservations and configuring them on your remote router, or configuring other things on the network apart from Proxmox or the server itself. This VM will effectively act as a local PC on the network with a GUI that you can use. Here are the relatively simple steps, in my example, I will be using CachyOS, but you  can really choose any OS of your choice.
 
@@ -816,7 +816,7 @@ To save hardware resources, this VM should be only started while needed and used
 ![CachyOS VM](contentimages/CachyOS_VM.png)
 
 
-## 5. 🏁Final test for any DNS / IP Leaks from both containers ✅
+## 5. Final test for any DNS / IP Leaks from both containers
 
 ![Testing VPN](contentimages/vpn-lxc-test.png)
 
@@ -829,7 +829,7 @@ It works! All routing goes through my VPN including any DNS queries!
 
 
 
-## 6. 👮 Final checks / Hardening 🛡️
+## 6. Final checks / Hardening
 
 - 🛡 Harden kernel sysctls
 
@@ -973,7 +973,7 @@ grep policy /etc/pve/firewall/cluster.fw
 grep policy /etc/pve/nodes/$(hostname)/host.fw
 ```
 
-## 7. 🚀 Future Expansion
+## 7. Future Expansion
 
 The architecture supports adding more containers, such as:
 
