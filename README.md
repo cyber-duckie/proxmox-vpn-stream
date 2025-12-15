@@ -1,23 +1,23 @@
 # proxmox-vpn-stream (Proxmox + VPN Streaming + Modular LXC Stack)
 
 ## Content Overview:
-1.[📦Overview](#overview)<br/>
-2.[🗺️Architecture Diagram (ASCII)](#architecture-diagram)<br/>
-3.[⚙️How it works](#how-it-works)<br/>
-4.[🏗️Setup Guide](#setup-guide)<br/>
-  4.1[🧑‍💻Install Proxmox and configure secure defaults🔒](#install-proxmox-and-configure-secure-defaults)<br/>
-  4.2[📡Create a VPN LXC](#create-vpn-lxc)<br/>
-  4.3[🎬Create a Stremio LXC](#reate-a-stremio-lxc-attached-to-the-private-vpn-bridge-and-one-network-to-stream-locally)<br/>
-  4.4[🐳Install Docker and run the Stremio Server⚡](#install-docker-and-run-the-stremio-server)<br/>
-  4.5[🚫Disable IPv6](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#45-disable-ipv6)<br/>
-  4.6[🌐Set up NAT and IPv4 forwarding rules](https://github.com/cyber-duckie/hardend-home-server/tree/main?tab=readme-ov-file#46-set-up-nat-and-ipv4-forwarding-rules)<br/>
-  4.7[⚙️Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection⚡](#create-a-script-to-handle-automatic-setting-up-of-a-wireguard-connection-on-startup--boot-and-then-removing-the-non-vpn-outbound-connection)<br/>
-  4.8[⏱️Set the Start/ shutdown order🔁](#set-the-start-shutdown-order)<br/>
-  4.9[🔥Set up a hardened Firewall 🧱](#set-up-a-hardened-firewall-)<br/>
-  4.10[🖥️ Set up a Maintenance LXC (CachyOS) ⚙️](#set-up-a-maintenance-lxc-cachyos)<br/>
-5.[🏁Final test for any DNS / IP Leaks from both containers ✅](#final-test-for-any-dns--ip-leaks-from-both-containers)<br/>
-6.[👮 Final checks / Hardening 🛡️](#final-checks--hardening)<br/>
-7.[🚀Future Expansion](#future-expansion)<br/>
+1.[📦Overview](#1overview)<br/>
+2.[🗺️Architecture Diagram (ASCII)](#2architecture-diagram-ascii)<br/>
+3.[⚙️How it works](#3how-it-works)<br/>
+4.[🏗️Setup Guide](#4setup-guide)<br/>
+  4.1[🧑‍💻Install Proxmox and configure secure defaults🔒](#41install-proxmox-and-configure-secure-defaults)<br/>
+  4.2[📡Create a VPN LXC](#42create-vpn-lxc)<br/>
+  4.3[🎬Create a Stremio LXC](#43create-a-stremio-lxc-attached-to-the-private-vpn-bridge-and-one-network-to-stream-locally)<br/>
+  4.4[🐳Install Docker and run the Stremio Server⚡](#44install-docker-and-run-the-stremio-server)<br/>
+  4.5[🚫Disable IPv6](#45-disable-ipv6)<br/>
+  4.6[🌐Set up NAT and IPv4 forwarding rules](#46-set-up-nat-and-ipv4-forwarding-rules)<br/>
+  4.7[⚙️Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection⚡](#47create-a-script-to-handle-automatic-setting-up-of-a-wireguard-connection-on-startup--boot-and-then-removing-the-non-vpn-outbound-connection)<br/>
+  4.8[⏱️Set the Start/ shutdown order🔁](#48set-the-start-shutdown-order)<br/>
+  4.9[🔥Set up a hardened Firewall 🧱](#49set-up-a-hardened-firewall-)<br/>
+  4.10[🖥️ Set up a Maintenance LXC (CachyOS) ⚙️](#410set-up-a-maintenance-lxc-cachyos)<br/>
+5.[🏁Final test for any DNS / IP Leaks from both containers ✅](#5final-test-for-any-dns--ip-leaks-from-both-containers)<br/>
+6.[👮 Final checks / Hardening 🛡️](#6final-checks--hardening)<br/>
+7.[🚀Future Expansion](#7future-expansion)<br/>
 
 
 
