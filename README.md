@@ -2,11 +2,11 @@
 
 ## Content Overview:
 1.[📦Overview](#overview)<br/>
-2.[🗺️Architecture Diagram (ASCII)](#architecture-diagram-ascii)<br/>
+2.[🗺️Architecture Diagram (ASCII)](#architecture-diagram)<br/>
 3.[⚙️How it works](#how-it-works)<br/>
 4.[🏗️Setup Guide](#setup-guide)<br/>
   4.1[🧑‍💻Install Proxmox and configure secure defaults🔒](#install-proxmox-and-configure-secure-defaults)<br/>
-  4.2[📡Create a VPN LXC](#create-vpn-lxc)<br/>
+  4.2[📡Create a VPN LXC](#create-a-vpn-lxc)<br/>
   4.3[🎬Create a Stremio LXC](#create-a-stremio-lxc)<br/>
   4.4[🐳Install Docker and run the Stremio Server⚡](#install-docker)<br/>
   4.5[🚫Disable IPv6](#disable-ipv6)<br/>
@@ -488,7 +488,7 @@ sysctl net.ipv6.conf.default.disable_ipv6
 
 - Should return '1'
 
-<a id="setup-nat"></a>
+<a id="set-up-nat"></a>
 ### 4.6 Set up NAT and IPv4 forwarding rules:
 
 
@@ -780,7 +780,7 @@ What this ensures against:<br/><br/>
 
 
 
-<a id="set-start-shutdown-order"></a>
+<a id="set-the-start-shutdown-order"></a>
 ### 4.8 ⏱️Set the Start/ shutdown order🔁
 This makes sure that the VPN LXC boots first, then Stremio second so it can build a connection seamlessly
 
