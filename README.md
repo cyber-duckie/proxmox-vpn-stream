@@ -1,28 +1,28 @@
 # proxmox-vpn-stream (Proxmox + VPN Streaming + Modular LXC Stack)
 
 ## Content Overview:
-1.[📦Overview](#1overview)<br/>
-2.[🗺️Architecture Diagram (ASCII)](#2architecture-diagram-ascii)<br/>
-3.[⚙️How it works](#3how-it-works)<br/>
-4.[🏗️Setup Guide](#4setup-guide)<br/>
-  4.1[🧑‍💻Install Proxmox and configure secure defaults🔒](#41install-proxmox-and-configure-secure-defaults)<br/>
-  4.2[📡Create a VPN LXC](#42create-vpn-lxc)<br/>
-  4.3[🎬Create a Stremio LXC](#43create-a-stremio-lxc-attached-to-the-private-vpn-bridge-and-one-network-to-stream-locally)<br/>
-  4.4[🐳Install Docker and run the Stremio Server⚡](#44install-docker-and-run-the-stremio-server)<br/>
-  4.5[🚫Disable IPv6](#45-disable-ipv6)<br/>
-  4.6[🌐Set up NAT and IPv4 forwarding rules](#46-set-up-nat-and-ipv4-forwarding-rules)<br/>
-  4.7[⚙️Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection⚡](#47create-a-script-to-handle-automatic-setting-up-of-a-wireguard-connection-on-startup--boot-and-then-removing-the-non-vpn-outbound-connection)<br/>
-  4.8[⏱️Set the Start/ shutdown order🔁](#48set-the-start-shutdown-order)<br/>
-  4.9[🔥Set up a hardened Firewall 🧱](#49set-up-a-hardened-firewall-)<br/>
-  4.10[🖥️ Set up a Maintenance LXC (CachyOS) ⚙️](#410set-up-a-maintenance-lxc-cachyos)<br/>
-5.[🏁Final test for any DNS / IP Leaks from both containers ✅](#5final-test-for-any-dns--ip-leaks-from-both-containers)<br/>
-6.[👮 Final checks / Hardening 🛡️](#6final-checks--hardening)<br/>
-7.[🚀Future Expansion](#7future-expansion)<br/>
+1.[📦Overview](#overview)<br/>
+2.[🗺️Architecture Diagram (ASCII)](#architecture-diagram-ascii)<br/>
+3.[⚙️How it works](#how-it-works)<br/>
+4.[🏗️Setup Guide](#setup-guide)<br/>
+  4.1[🧑‍💻Install Proxmox and configure secure defaults🔒](#install-proxmox-and-configure-secure-defaults)<br/>
+  4.2[📡Create a VPN LXC](#create-vpn-lxc)<br/>
+  4.3[🎬Create a Stremio LXC](#create-a-stremio-lxc)<br/>
+  4.4[🐳Install Docker and run the Stremio Server⚡](#install-docker)<br/>
+  4.5[🚫Disable IPv6](#disable-ipv6)<br/>
+  4.6[🌐Set up NAT and IPv4 forwarding rules](#set-up-nat)<br/>
+  4.7[⚙️Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection⚡](#create-a-script)<br/>
+  4.8[⏱️Set the Start/ shutdown order🔁](#set-the-start-shutdown-order)<br/>
+  4.9[🔥Set up a hardened Firewall 🧱](#set-up-a-hardened-firewall)<br/>
+  4.10[🖥️ Set up a Maintenance VM (CachyOS)](#set-up-a-maintenance-vm)<br/>
+5.[🏁Final test for any DNS / IP Leaks from both containers ✅](#final-test)
+5.[🏁Final Checks / Hardening ✅](#final-checks)
+7.[🚀Future Expansion](#future-expansion)<br/>
 
 
 
-
-## 1. Overview
+<a id="overview"></a>
+## 1. 📦Overview
 
 This project documents a hardened, media streaming server that uses Stremio which I built as a gift for a relative.
 The system is designed for security, modularity, and expandability, using Proxmox VE as the hypervisor. This guide will showcase how I went about setting up this server step by step. It is meant to be setup and configured in a way that it can be basically forgotten about and require no manual maintenance or updating, as this will all be set up to be done automatically.
@@ -51,8 +51,8 @@ Users are responsible for complying with local laws and service agreements.
 
 
 
-
-## 2. Architecture Diagram (ASCII)
+<a id="architecture-diagram"></a>
+## 2. 🗺️Architecture Diagram (ASCII)
 ```
                 ┌─────────────────────────┐
                 │     Proxmox Host        │   <--- VPN Connection via Tailscale
@@ -83,7 +83,8 @@ Users are responsible for complying with local laws and service agreements.
 ```
 <br/>
 
-## 3. How It Works
+<a id="how-it-works"></a>
+## 3. ⚙️How It Works
 -  Proxmox as the Core
 
 The Proxmox host manages all LXCs and provides hardware virtualization, backups, and isolation features.
@@ -110,10 +111,12 @@ Benefits:
 ✅ Streaming addon geolocation freedom
 
 
-
+<a id="setup-guide"></a>
 ## 4. Setup Guide
 
-### 4.1 Install Proxmox and configure secure defaults
+
+<a id="install-proxmox-and-configure-secure-defaults"></a>
+### 4.1 🧑‍💻Install Proxmox and configure secure defaults🔒
 
 - 🧑‍💻 Create a Sudo User<br/>
 
@@ -204,6 +207,7 @@ dpkg-reconfigure --priority=low unattended-upgrades
 
 
 
+<a id="creata-a-vpn-lxc"></a>
 ### 4.2 Create VPN LXC
 
 ### Settings for my VPN LXC:
@@ -351,6 +355,7 @@ ip a show wg0
 
 <br/>
 
+<a id="create-a-stremio-lxc"></a>
 ### 4.3 Create a Stremio LXC attached to the private VPN bridge and one network to stream locally
 
 Settings for my Stremio LXC:
@@ -378,8 +383,8 @@ Settings for my Stremio LXC:
 
 
 
-
-### 4.4 Install Docker and run the Stremio Server
+<a id="install-docker"></a>
+### 4.4 🐳Install Docker and run the Stremio Server⚡
 
 
 
@@ -438,8 +443,8 @@ Thenn check that you can reach it via your webbrowser on port 11470 of that LXC 
 e.g. 192.168.0.29:11470
 
 
-
-### 4.5 Disable IPv6 
+<a id="disable-ipv6"></a>
+### 4.5 🚫Disable IPv6 
 
   Disable IPv6:
 
@@ -483,7 +488,7 @@ sysctl net.ipv6.conf.default.disable_ipv6
 
 - Should return '1'
 
-
+<a id="setup-nat"></a>
 ### 4.6 Set up NAT and IPv4 forwarding rules:
 
 
@@ -618,7 +623,7 @@ netfilter-persistent save
 ```
 
 
-
+<a id="create-a-script"></a>
 ### 4.7 Create a script to handle automatic setting up of a Wireguard connection on startup / Boot and then removing the non-vpn outbound connection
 
 ⚙️**Systemd Auto-Start Integration**⚙️
@@ -775,15 +780,16 @@ What this ensures against:<br/><br/>
 
 
 
-
-### 4.8 Set the Start/ shutdown order
+<a id="set-start-shutdown-order"></a>
+### 4.8 ⏱️Set the Start/ shutdown order🔁
 This makes sure that the VPN LXC boots first, then Stremio second so it can build a connection seamlessly
 
  Under each LXC in the Proxmox node ➡️ Options ➡️ Start/ Shutdown order ➡️ Edit (VPN-LXC=1, Stremio-LXC=2)
 
  
 
-### 4.9 Set up a hardened Firewall
+<a id="set-up-a-hardened-firewall"></a>
+### 4.9 🔥Set up a hardened Firewall 🧱
 
 
 - General Policy: Drop all inbound traffic by default; allow only explicitly defined connections.
@@ -799,8 +805,8 @@ Apply the above shown Firewall rules on the Host-level under Proxmox->Firewall->
 
 
 
-
-## 4.10 Set up a Maintenance VM (CachyOS)
+<a id="set-up-a-maintenance-vm"></a>
+## 4.10 🖥️ Set up a Maintenance VM (CachyOS)
 
 This is optional, but I would highly recommend setting this up if you plan on setting this server up on a remote site and won't be having direct access to it. This 'maintenance VM' will be highly beneficial for handling IP reservations and configuring them on your remote router, or configuring other things on the network apart from Proxmox or the server itself. This VM will effectively act as a local PC on the network with a GUI that you can use. Here are the relatively simple steps, in my example, I will be using CachyOS, but you  can really choose any OS of your choice.
 
@@ -816,7 +822,9 @@ To save hardware resources, this VM should be only started while needed and used
 ![CachyOS VM](contentimages/CachyOS_VM.png)
 
 
-## 5. Final test for any DNS / IP Leaks from both containers
+
+<a id="final-test"></a>
+## 5. 🏁Final test for any DNS / IP Leaks from both containers👌
 
 ![Testing VPN](contentimages/vpn-lxc-test.png)
 
@@ -828,8 +836,8 @@ Then a quick check using an online IP lookup tool:
 It works! All routing goes through my VPN including any DNS queries!
 
 
-
-## 6. Final checks / Hardening
+<a id="final-checks"></a>
+## 6. 👮Final checks / Hardening🛡️
 
 - 🛡 Harden kernel sysctls
 
@@ -973,7 +981,8 @@ grep policy /etc/pve/firewall/cluster.fw
 grep policy /etc/pve/nodes/$(hostname)/host.fw
 ```
 
-## 7. Future Expansion
+<a id="future-expansion"></a>
+## 7. 🚀Future Expansion
 
 The architecture supports adding more containers, such as:
 
