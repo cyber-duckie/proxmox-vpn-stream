@@ -655,6 +655,20 @@ sudo nano /usr/local/bin/vpn-dns-lock.sh
 Enter the following script:
 <br/>
 
+> [!WARNING]
+> Locking `/etc/resolv.conf` is a fail-closed design.
+>
+> If the VPN tunnel does not come up, DNS resolution will fail completely.
+>
+> **Recovery:**
+> ```
+> chattr -i /etc/resolv.conf
+> echo "nameserver 1.1.1.1" > /etc/resolv.conf
+> ```
+> Restore the VPN before re-locking the file.
+
+
+
 ```
 #!/bin/bash
 # vpn-dns-lock.sh
@@ -696,17 +710,7 @@ iptables -I OUTPUT ! -d $VPN_DNS -p tcp --dport 53 -j REJECT
 echo "[INFO] DNS leak protection applied."
 ```
 
-> [!WARNING]
-> Locking `/etc/resolv.conf` is a fail-closed design.
->
-> If the VPN tunnel does not come up, DNS resolution will fail completely.
->
-> **Recovery:**
-> ```
-> chattr -i /etc/resolv.conf
-> echo "nameserver 1.1.1.1" > /etc/resolv.conf
-> ```
-> Restore the VPN before re-locking the file.
+
 
 Then, make it executable:
 
@@ -796,19 +800,20 @@ Apply the above shown Firewall rules on the Host-level under Proxmox->Firewall->
 
 
 
-## 4.10 🖥️ Set up a Maintenance LXC (CachyOS) ⚙️
+## 4.10 🖥️ Set up a Maintenance VM (CachyOS) ⚙️
 
-This is optional, but I would highly recommend setting this up if you plan on setting this server up on a remote site and won't be having direct access to it. This 'maintenance LXC' will be highly beneficial for handling IP reservations and configuring them on your remote router, or configuring other things on the network apart from Proxmox or the server itself. AThis LXC will effectively act as a local PC on the network with a GUI that you can use. Here are the relatively simple steps, in my example, I will be using CachyOS, but you  can really choose any OS of your choice.
+This is optional, but I would highly recommend setting this up if you plan on setting this server up on a remote site and won't be having direct access to it. This 'maintenance VM' will be highly beneficial for handling IP reservations and configuring them on your remote router, or configuring other things on the network apart from Proxmox or the server itself. This VM will effectively act as a local PC on the network with a GUI that you can use. Here are the relatively simple steps, in my example, I will be using CachyOS, but you  can really choose any OS of your choice.
 
-- In your Proxmox server GUI, navigate to Datacenter➡️ Proxmox ➡️ local (proxmox) ➡️ ISO Images ➡️ Download from URL.
+- In your Proxmox server GUI, navigate to: Datacenter➡️ Proxmox ➡️ local (proxmox) ➡️ ISO Images ➡️ Download from URL.
   - search for your OS in a new tab and copy the downloadlink and paste it in there.
   - Hit 'Query URL' to get the File name and hit download.
  
-- Then, create a new LXC. Make sure the minimum hardware resources are met and choose the ISO to boot it from that you just downloaded.
+- Then, create a new VM. Make sure the minimum hardware resources are met and choose the ISO to boot it from that you just downloaded.
 
 - Follow the steps depending on your OS and it should spin up a practical maintenance you can now use if you need it.
-To save hardware resources, this LXC should be only started while needed and used.
+To save hardware resources, this VM should be only started while needed and used.
 
+![CachyOS VM](contentimages/CachyOS_VM.png)
 
 
 ## 5. 🏁Final test for any DNS / IP Leaks from both containers ✅
