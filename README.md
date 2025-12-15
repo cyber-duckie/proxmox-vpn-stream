@@ -15,8 +15,8 @@
   4.8[⏱️Set the Start/ shutdown order🔁](#set-the-start-shutdown-order)<br/>
   4.9[🔥Set up a hardened Firewall 🧱](#set-up-a-hardened-firewall)<br/>
   4.10[🖥️ Set up a Maintenance VM (CachyOS)](#set-up-a-maintenance-vm)<br/>
-5.[🏁Final test for any DNS / IP Leaks from both containers ✅](#final-test)
-5.[🏁Final Checks / Hardening ✅](#final-checks)
+5.[🏁Final test for any DNS / IP Leaks from both containers ✅](#final-test)<br/>
+6.[🏁Final Checks / Hardening ✅](#final-checks)<br/>
 7.[🚀Future Expansion](#future-expansion)<br/>
 
 
