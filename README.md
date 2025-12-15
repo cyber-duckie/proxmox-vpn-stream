@@ -31,6 +31,9 @@ In it's current configuration, it runs:
 
 --> 🌐🔑 VPN LXC – Runs ProtonVPN / WireGuard and acts as a gateway for the stremio LXC.
 
+> [!NOTE]
+> While ProtonVPN is used here, any WireGuard-compatible VPN provider can be substituted.
+
 --> 📺🎬 Stremio LXC – Runs the Stremio server, sending all outbound traffic through the VPN container.
 
 Network routing is handled using policy-based routing, iptables, and Proxmox container configuration.
