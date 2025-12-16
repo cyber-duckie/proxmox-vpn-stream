@@ -121,6 +121,19 @@ Benefits:
 <a id="install-proxmox-and-configure-secure-defaults"></a>
 ### 4.1 🧑‍💻Install Proxmox and configure secure defaults🔒
 
+- Check if sudo is installed:
+
+```
+sudo --version
+```
+If you don't get an output, sudo is not installed. install it with:
+
+```
+apt update
+apt install sudo
+```
+
+
 - 🧑‍💻 Create a Sudo User<br/>
 
 ```
